@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import routes from "./routes";
 
 const app = express();
 
@@ -19,5 +20,7 @@ app.get("/api/health", (req, res) => {
     message: "AI Healthcare API Running 🚀",
   });
 });
+
+app.use("/api", routes);
 
 export default app;
