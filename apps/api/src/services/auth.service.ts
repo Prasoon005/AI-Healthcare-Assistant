@@ -1,5 +1,9 @@
 import { createUser, findUserByEmail } from "../repositories/auth.repository";
-import { hashPassword } from "../utils/hash";
+import { hashPassword, comparePassword } from "../utils/hash";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/jwt";
 import { RegisterInput } from "../validations/auth.validation";
 
 export const registerUser = async (data: RegisterInput) => {
@@ -21,5 +25,38 @@ export const registerUser = async (data: RegisterInput) => {
     id: user.id,
     name: user.name,
     email: user.email,
+  };
+};
+
+export const loginUser = async (
+  email: string,
+  password: string
+) => {
+  const user = await findUserByEmail(email);
+
+  if (!user) {
+    throw new Error("Invalid email or password");
+  }
+
+  const isPasswordValid = await comparePassword(
+    password,
+    user.password
+  );
+
+  if (!isPasswordValid) {
+    throw new Error("Invalid email or password");
+  }
+
+  const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
+
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    },
+    accessToken,
+    refreshToken,
   };
 };
