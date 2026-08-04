@@ -29,3 +29,36 @@ export const createUser = (
     },
   });
 };
+
+export const saveRefreshToken = (
+  token: string,
+  userId: string,
+  expiresAt: Date
+) => {
+  return prisma.refreshToken.create({
+    data: {
+      token,
+      userId,
+      expiresAt,
+    },
+  });
+};
+
+export const findRefreshToken = (token: string) => {
+  return prisma.refreshToken.findUnique({
+    where: {
+      token,
+    },
+    include: {
+      user: true,
+    },
+  });
+};
+
+export const deleteRefreshToken = (token: string) => {
+  return prisma.refreshToken.deleteMany({
+    where: {
+      token,
+    },
+  });
+};

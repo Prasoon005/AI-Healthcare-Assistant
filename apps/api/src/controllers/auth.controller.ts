@@ -6,6 +6,8 @@ import {
 import {
   registerUser,
   loginUser,
+  logoutUser,
+  refreshUserToken,
 } from "../services/auth.service";
 import { successResponse, errorResponse } from "../utils/response";
 
@@ -25,7 +27,9 @@ export const register = async (req: Request, res: Response) => {
     return errorResponse(
       res,
       400,
-      error instanceof Error ? error.message : "Registration failed"
+      error instanceof Error
+        ? error.message
+        : "Registration failed"
     );
   }
 };
@@ -52,6 +56,55 @@ export const login = async (req: Request, res: Response) => {
       error instanceof Error
         ? error.message
         : "Login failed"
+    );
+  }
+};
+
+export const refresh = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const token = req.body.refreshToken;
+
+    const data = await refreshUserToken(token);
+
+    return successResponse(
+      res,
+      200,
+      "Token refreshed",
+      data
+    );
+  } catch (error) {
+    return errorResponse(
+      res,
+      401,
+      error instanceof Error
+        ? error.message
+        : "Refresh failed"
+    );
+  }
+};
+
+export const logout = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const token = req.body.refreshToken;
+
+    await logoutUser(token);
+
+    return successResponse(
+      res,
+      200,
+      "Logout successful"
+    );
+  } catch {
+    return errorResponse(
+      res,
+      400,
+      "Logout failed"
     );
   }
 };

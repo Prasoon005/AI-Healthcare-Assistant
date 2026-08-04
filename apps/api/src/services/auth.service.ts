@@ -1,4 +1,13 @@
-import { createUser, findUserByEmail } from "../repositories/auth.repository";
+import jwt from "jsonwebtoken";
+
+import {
+  createUser,
+  findUserByEmail,
+  saveRefreshToken,
+  findRefreshToken,
+  deleteRefreshToken,
+} from "../repositories/auth.repository";
+import { env } from "../config/env";
 import { hashPassword, comparePassword } from "../utils/hash";
 import {
   generateAccessToken,
@@ -50,6 +59,16 @@ export const loginUser = async (
   const accessToken = generateAccessToken(user.id);
   const refreshToken = generateRefreshToken(user.id);
 
+  const expiresAt = new Date(
+    Date.now() + 7 * 24 * 60 * 60 * 1000
+  );
+
+  await saveRefreshToken(
+    refreshToken,
+    user.id,
+    expiresAt
+  );
+
   return {
     user: {
       id: user.id,
@@ -59,4 +78,30 @@ export const loginUser = async (
     accessToken,
     refreshToken,
   };
+};
+
+export const refreshUserToken = async (
+  token: string
+) => {
+  const storedToken = await findRefreshToken(token);
+
+  if (!storedToken) {
+    throw new Error("Invalid refresh token");
+  }
+
+  jwt.verify(token, env.JWT_REFRESH_SECRET);
+
+  const accessToken = generateAccessToken(
+    storedToken.user.id
+  );
+
+  return {
+    accessToken,
+  };
+};
+
+export const logoutUser = async (
+  token: string
+) => {
+  await deleteRefreshToken(token);
 };
