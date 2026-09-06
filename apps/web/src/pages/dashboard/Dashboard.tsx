@@ -19,6 +19,7 @@ import bgArtwork from "../../assets/bg-artwork.png";
 import { useAuth } from "../../context/AuthContext";
 import MedicationReminder from "./MedicationReminder";
 import VitalsCard from "./VitalsCard";
+import RiskMatrix from "./RiskMatrix";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -361,6 +362,8 @@ const Dashboard = () => {
           <MedicationReminder />
 
           <VitalsCard />
+
+          <RiskMatrix />
 
           {/* Bottom */}
           <section className="bottom-grid">
