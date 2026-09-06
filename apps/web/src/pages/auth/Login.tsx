@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { HeartPulse, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import bgArtwork from "../../assets/bg-artwork.png";
+import api from "../../api/axios";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,37 +15,36 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setError("");
 
-    if (!email || !password) {
-      setError("Please enter your email and password.");
+    if (!email.trim()) {
+      setError("Please enter your email address.");
+      return;
+    }
+
+    if (!password) {
+      setError("Please enter your password.");
       return;
     }
 
     try {
       setLoading(true);
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await api.post("/auth/login", {
+        email: email.trim(),
+        password,
+      });
 
       const { accessToken, refreshToken, user } = response.data.data;
 
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("user", JSON.stringify(user));
-
+      login(user, accessToken, refreshToken);
       navigate("/dashboard");
-    } catch (error: any) {
+    } catch (err: any) {
       setError(
-        error.response?.data?.message ||
+        err?.response?.data?.message ||
           "Invalid email or password."
       );
     } finally {
@@ -69,7 +70,7 @@ const Login = () => {
       {/* Header */}
       <header
         style={{
-          height: "64px",
+          height: "68px",
           width: "100%",
           display: "flex",
           alignItems: "center",
@@ -103,7 +104,7 @@ const Login = () => {
               justifyContent: "center",
             }}
           >
-            <HeartPulse size={18} color="#fff" />
+            <HeartPulse size={18} color="#ffffff" />
           </div>
 
           <span
@@ -122,7 +123,7 @@ const Login = () => {
             padding: "8px 20px",
             borderRadius: "22px",
             backgroundColor: "#09090b",
-            color: "#fff",
+            color: "#ffffff",
             textDecoration: "none",
             fontSize: "13px",
             fontWeight: 600,
@@ -132,10 +133,10 @@ const Login = () => {
         </Link>
       </header>
 
-      {/* Login Content */}
+      {/* Login */}
       <main
         style={{
-          minHeight: "calc(100vh - 64px)",
+          minHeight: "calc(100vh - 68px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -158,7 +159,6 @@ const Login = () => {
             boxSizing: "border-box",
           }}
         >
-          {/* Heading */}
           <div style={{ marginBottom: "32px" }}>
             <p
               style={{
@@ -196,9 +196,8 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Form */}
           <form
-            onSubmit={handleLogin}
+            onSubmit={handleSubmit}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -220,9 +219,10 @@ const Login = () => {
 
               <input
                 type="email"
-                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                disabled={loading}
                 style={{
                   width: "100%",
                   height: "48px",
@@ -274,9 +274,10 @@ const Login = () => {
 
               <input
                 type="password"
-                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                disabled={loading}
                 style={{
                   width: "100%",
                   height: "48px",
@@ -293,19 +294,24 @@ const Login = () => {
             </div>
 
             {error && (
-              <p
+              <div
                 style={{
-                  margin: "-8px 0 0",
+                  padding: "12px 14px",
+                  borderRadius: "12px",
+                  backgroundColor: "rgba(254,226,226,0.7)",
+                  border: "1px solid rgba(248,113,113,0.4)",
+                  color: "#b91c1c",
                   fontSize: "12px",
-                  color: "#dc2626",
+                  fontWeight: 600,
                 }}
               >
                 {error}
-              </p>
+              </div>
             )}
 
             <button
               type="submit"
+              disabled={loading}
               style={{
                 width: "100%",
                 height: "50px",
@@ -313,10 +319,11 @@ const Login = () => {
                 border: "none",
                 borderRadius: "15px",
                 backgroundColor: "#09090b",
-                color: "#fff",
+                color: "#ffffff",
                 fontSize: "14px",
                 fontWeight: 600,
-                cursor: "pointer",
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.65 : 1,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -324,11 +331,11 @@ const Login = () => {
               }}
             >
               {loading ? "Signing in..." : "Sign in"}
+
               {!loading && <ArrowRight size={17} />}
             </button>
           </form>
 
-          {/* Register */}
           <p
             style={{
               margin: "28px 0 0",
