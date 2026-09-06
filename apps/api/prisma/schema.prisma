@@ -29,6 +29,7 @@ model User {
   profile       HealthProfile?
   refreshTokens RefreshToken[]
   medications   Medication[]
+  vitalLogs     VitalLog[]
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -101,4 +102,20 @@ model MedicationLog {
   createdAt     DateTime   @default(now())
 
   @@unique([medicationId, scheduledDate, scheduledTime])
+}
+
+model VitalLog {
+  id          String   @id @default(cuid())
+  heartRate   Int?
+  systolic    Int?
+  diastolic   Int?
+  spo2        Int?
+  recordedAt  DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId, recordedAt])
 }
