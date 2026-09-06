@@ -21,6 +21,7 @@ import MedicationReminder from "./MedicationReminder";
 import VitalsCard from "./VitalsCard";
 import RiskMatrix from "./RiskMatrix";
 import EmergencyCard from "./EmergencyCard";
+import MedicalVault from "./MedicalVault";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -367,6 +368,8 @@ const Dashboard = () => {
           <RiskMatrix />
 
           <EmergencyCard />
+
+          <MedicalVault />
 
           {/* Bottom */}
           <section className="bottom-grid">

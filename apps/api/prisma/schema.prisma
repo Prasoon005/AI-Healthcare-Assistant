@@ -20,19 +20,20 @@ enum Gender {
 }
 
 model User {
-  id            String         @id @default(cuid())
+  id            String            @id @default(cuid())
   name          String
-  email         String         @unique
+  email         String            @unique
   password      String
-  role          UserRole       @default(USER)
-  isVerified    Boolean        @default(false)
+  role          UserRole          @default(USER)
+  isVerified    Boolean           @default(false)
   profile       HealthProfile?
   refreshTokens RefreshToken[]
   medications   Medication[]
   vitalLogs     VitalLog[]
+  documents     MedicalDocument[]
 
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 }
 
 model RefreshToken {
@@ -82,8 +83,10 @@ model Medication {
   instructions String?
   times        String[]
   active       Boolean         @default(true)
+
   userId       String
   user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   logs         MedicationLog[]
 
   createdAt    DateTime        @default(now())
@@ -91,15 +94,16 @@ model Medication {
 }
 
 model MedicationLog {
-  id            String     @id @default(cuid())
+  id            String      @id @default(cuid())
   medicationId  String
   medication    Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
   scheduledDate DateTime
   scheduledTime String
-  taken         Boolean    @default(false)
+  taken         Boolean     @default(false)
   takenAt       DateTime?
 
-  createdAt     DateTime   @default(now())
+  createdAt     DateTime    @default(now())
 
   @@unique([medicationId, scheduledDate, scheduledTime])
 }
@@ -118,4 +122,22 @@ model VitalLog {
   createdAt   DateTime @default(now())
 
   @@index([userId, recordedAt])
+}
+
+model MedicalDocument {
+  id            String   @id @default(cuid())
+  name          String
+  originalName  String
+  filePath      String
+  mimeType      String
+  fileSize      Int
+  extractedText String?
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId, createdAt])
 }

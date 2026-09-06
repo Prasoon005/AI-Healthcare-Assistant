@@ -5,6 +5,7 @@ import userRoutes from "./user.routes";
 import medicationRoutes from "./medication.routes";
 import vitalRoutes from "./vital.routes";
 import riskRoutes from "./risk.routes";
+import documentRoutes from "./document.routes";
 const router = Router();
 
 router.use("/auth", authRoutes);
@@ -12,4 +13,8 @@ router.use("/vitals", vitalRoutes);
 router.use("/users", userRoutes);
 router.use("/medications", medicationRoutes);
 router.use("/risk-matrix", riskRoutes);
+router.use(
+  "/documents",
+  documentRoutes
+);
 export default router;

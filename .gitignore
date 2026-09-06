@@ -6,3 +6,5 @@ uploads
 coverage
 .vscode
 .DS_Store
+
+uploads/
