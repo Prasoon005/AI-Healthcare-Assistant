@@ -213,8 +213,7 @@ const Home = () => {
           </p>
 
           {/* Signup Bar */}
-          <form
-            onSubmit={(e) => e.preventDefault()}
+          <div
             style={{
               display: "flex",
               alignItems: "center",
@@ -242,8 +241,8 @@ const Home = () => {
               }}
             />
 
-            <button
-              type="submit"
+            <Link
+              to="/register"
               style={{
                 backgroundColor: "#09090b",
                 color: "#ffffff",
@@ -253,11 +252,13 @@ const Home = () => {
                 fontSize: "13px",
                 fontWeight: 600,
                 cursor: "pointer",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
               }}
             >
               Sign up
-            </button>
-          </form>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

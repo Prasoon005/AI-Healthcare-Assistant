@@ -1,8 +1,56 @@
+import { useState } from "react";
 import { HeartPulse, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import bgArtwork from "../../assets/bg-artwork.png";
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setError("");
+
+    if (!email || !password) {
+      setError("Please enter your email and password.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      const { accessToken, refreshToken, user } = response.data.data;
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      navigate("/dashboard");
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message ||
+          "Invalid email or password."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       style={{
@@ -150,7 +198,7 @@ const Login = () => {
 
           {/* Form */}
           <form
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleLogin}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -173,6 +221,8 @@ const Login = () => {
               <input
                 type="email"
                 placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 style={{
                   width: "100%",
                   height: "48px",
@@ -225,6 +275,8 @@ const Login = () => {
               <input
                 type="password"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 style={{
                   width: "100%",
                   height: "48px",
@@ -239,6 +291,18 @@ const Login = () => {
                 }}
               />
             </div>
+
+            {error && (
+              <p
+                style={{
+                  margin: "-8px 0 0",
+                  fontSize: "12px",
+                  color: "#dc2626",
+                }}
+              >
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"
@@ -259,8 +323,8 @@ const Login = () => {
                 gap: "8px",
               }}
             >
-              Sign in
-              <ArrowRight size={17} />
+              {loading ? "Signing in..." : "Sign in"}
+              {!loading && <ArrowRight size={17} />}
             </button>
           </form>
 
