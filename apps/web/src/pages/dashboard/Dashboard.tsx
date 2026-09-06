@@ -22,6 +22,7 @@ import VitalsCard from "./VitalsCard";
 import RiskMatrix from "./RiskMatrix";
 import EmergencyCard from "./EmergencyCard";
 import MedicalVault from "./MedicalVault";
+import DailyPlanner from "./DailyPlanner";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -370,6 +371,8 @@ const Dashboard = () => {
           <EmergencyCard />
 
           <MedicalVault />
+
+          <DailyPlanner />
 
           {/* Bottom */}
           <section className="bottom-grid">
