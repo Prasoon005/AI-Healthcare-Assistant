@@ -28,47 +28,77 @@ model User {
   isVerified    Boolean        @default(false)
   profile       HealthProfile?
   refreshTokens RefreshToken[]
+  medications   Medication[]
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 }
 
 model RefreshToken {
-  id         String   @id @default(cuid())
-  token      String   @unique
-  expiresAt  DateTime
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
 
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model HealthProfile {
-  id                   String   @id @default(cuid())
+  id                String   @id @default(cuid())
 
-  age                  Int?
-  gender               Gender?
+  age               Int?
+  gender            Gender?
 
-  height               Float?
-  weight               Float?
+  height            Float?
+  weight            Float?
 
-  smoking              Boolean?
-  alcohol              Boolean?
+  smoking           Boolean?
+  alcohol           Boolean?
 
-  exerciseDays         Int?
-  sleepHours           Float?
+  exerciseDays      Int?
+  sleepHours        Float?
 
-  allergies            String?
-  medicalConditions    String?
-  medications          String?
+  allergies         String?
+  medicalConditions String?
+  medications       String?
 
-  emergencyName        String?
-  emergencyPhone       String?
+  emergencyName     String?
+  emergencyPhone    String?
 
-  userId               String   @unique
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Medication {
+  id           String          @id @default(cuid())
+  name         String
+  dosage       String
+  instructions String?
+  times        String[]
+  active       Boolean         @default(true)
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs         MedicationLog[]
+
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model MedicationLog {
+  id            String     @id @default(cuid())
+  medicationId  String
+  medication    Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  scheduledDate DateTime
+  scheduledTime String
+  taken         Boolean    @default(false)
+  takenAt       DateTime?
+
+  createdAt     DateTime   @default(now())
+
+  @@unique([medicationId, scheduledDate, scheduledTime])
 }
