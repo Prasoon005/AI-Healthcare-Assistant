@@ -20,6 +20,7 @@ import { useAuth } from "../../context/AuthContext";
 import MedicationReminder from "./MedicationReminder";
 import VitalsCard from "./VitalsCard";
 import RiskMatrix from "./RiskMatrix";
+import EmergencyCard from "./EmergencyCard";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -364,6 +365,8 @@ const Dashboard = () => {
           <VitalsCard />
 
           <RiskMatrix />
+
+          <EmergencyCard />
 
           {/* Bottom */}
           <section className="bottom-grid">
