@@ -4,22 +4,31 @@ import {
   Copy,
   MapPin,
   Phone,
+  Plus,
   ShieldAlert,
+  Trash2,
   UserRound,
   X,
 } from "lucide-react";
 
-interface EmergencyData {
+interface EmergencyContact {
   name: string;
   phone: string;
+}
+
+interface EmergencyData {
+  contacts: EmergencyContact[];
   bloodGroup: string;
   allergies: string;
   conditions: string;
 }
 
+const MAX_CONTACTS = 3;
+
+const emptyContact = (): EmergencyContact => ({ name: "", phone: "" });
+
 const defaultData: EmergencyData = {
-  name: "",
-  phone: "",
+  contacts: [emptyContact()],
   bloodGroup: "",
   allergies: "",
   conditions: "",
@@ -49,7 +58,11 @@ const EmergencyCard = () => {
 
     if (saved) {
       try {
-        setData(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+
+        if (Array.isArray(parsed?.contacts)) {
+          setData(parsed);
+        }
       } catch {
         localStorage.removeItem(
           "emergencyData"
@@ -58,14 +71,55 @@ const EmergencyCard = () => {
     }
   }, []);
 
+  const updateContact = (
+    index: number,
+    field: keyof EmergencyContact,
+    value: string
+  ) => {
+    setData((prev) => {
+      const contacts = [...prev.contacts];
+      contacts[index] = { ...contacts[index], [field]: value };
+      return { ...prev, contacts };
+    });
+  };
+
+  const addContact = () => {
+    setData((prev) =>
+      prev.contacts.length >= MAX_CONTACTS
+        ? prev
+        : { ...prev, contacts: [...prev.contacts, emptyContact()] }
+    );
+  };
+
+  const removeContact = (index: number) => {
+    setData((prev) => ({
+      ...prev,
+      contacts: prev.contacts.filter((_, i) => i !== index),
+    }));
+  };
+
   const saveEmergencyData = (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
 
+    const cleanedContacts = data.contacts.filter(
+      (contact) => contact.name.trim() || contact.phone.trim()
+    );
+
+    const cleaned: EmergencyData = {
+      ...data,
+      contacts:
+        cleanedContacts.length > 0
+          ? cleanedContacts
+          : [emptyContact()],
+    };
+
+    setData(cleaned);
+
     localStorage.setItem(
       "emergencyData",
-      JSON.stringify(data)
+      JSON.stringify(cleaned)
     );
 
     setShowForm(false);
@@ -131,14 +185,20 @@ const EmergencyCard = () => {
         `My current location:\n${url}`
       );
 
-      if (data.phone) {
-        window.open(
-          `https://wa.me/${data.phone.replace(
-            /\D/g,
-            ""
-          )}?text=${message}`,
-          "_blank"
-        );
+      const contactsWithPhone = data.contacts.filter(
+        (contact) => contact.phone.trim()
+      );
+
+      if (contactsWithPhone.length > 0) {
+        contactsWithPhone.forEach((contact) => {
+          window.open(
+            `https://wa.me/${contact.phone.replace(
+              /\D/g,
+              ""
+            )}?text=${message}`,
+            "_blank"
+          );
+        });
       } else {
         await navigator.clipboard?.writeText(
           url
@@ -183,14 +243,26 @@ const EmergencyCard = () => {
   };
 
   const callEmergencyContact = () => {
-    if (!data.phone) {
+    const primary = data.contacts.find(
+      (contact) => contact.phone.trim()
+    );
+
+    if (!primary) {
       setShowForm(true);
       return;
     }
 
     window.location.href =
-      `tel:${data.phone}`;
+      `tel:${primary.phone}`;
   };
+
+  const primaryContact = data.contacts.find(
+    (contact) => contact.name.trim() || contact.phone.trim()
+  );
+
+  const savedContactsCount = data.contacts.filter(
+    (contact) => contact.phone.trim()
+  ).length;
 
   return (
     <>
@@ -219,8 +291,7 @@ const EmergencyCard = () => {
               setShowForm(true)
             }
           >
-            {data.name ||
-            data.phone
+            {primaryContact
               ? "Edit"
               : "Set up"}
           </button>
@@ -233,7 +304,7 @@ const EmergencyCard = () => {
 
           <div className="medical-id-info">
             <strong>
-              {data.name ||
+              {primaryContact?.name ||
                 "Medical ID not set"}
             </strong>
 
@@ -241,6 +312,14 @@ const EmergencyCard = () => {
               {data.bloodGroup
                 ? `Blood group · ${data.bloodGroup}`
                 : "Add your emergency information"}
+            </span>
+
+            <span>
+              {savedContactsCount > 0
+                ? `${savedContactsCount} emergency contact${
+                    savedContactsCount > 1 ? "s" : ""
+                  } saved`
+                : "No emergency contact saved"}
             </span>
           </div>
         </div>
@@ -328,9 +407,11 @@ const EmergencyCard = () => {
 
         <p className="emergency-note">
           SOS uses your device location and
-          opens your emergency contact through
-          WhatsApp. It does not automatically
-          contact emergency services.
+          opens WhatsApp for every saved
+          emergency contact. It does not
+          automatically contact emergency
+          services, and your browser may ask
+          permission to open multiple tabs.
         </p>
       </div>
 
@@ -379,42 +460,74 @@ const EmergencyCard = () => {
                 saveEmergencyData
               }
             >
-              <label>
-                <span>
-                  Emergency contact name
-                </span>
+              <div className="emergency-contacts-list">
+                {data.contacts.map((contact, index) => (
+                  <div
+                    className="emergency-contact-fieldset"
+                    key={index}
+                  >
+                    <div className="emergency-contact-fieldset-header">
+                      <span>Emergency contact {index + 1}</span>
 
-                <input
-                  type="text"
-                  value={data.name}
-                  onChange={(e) =>
-                    setData({
-                      ...data,
-                      name: e.target.value,
-                    })
-                  }
-                  placeholder="e.g. Mom"
-                />
-              </label>
+                      {data.contacts.length > 1 && (
+                        <button
+                          type="button"
+                          className="remove-contact-button"
+                          onClick={() => removeContact(index)}
+                          aria-label={`Remove contact ${index + 1}`}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
 
-              <label>
-                <span>
-                  Phone number
-                </span>
+                    <label>
+                      <span>Name</span>
 
-                <input
-                  type="tel"
-                  value={data.phone}
-                  onChange={(e) =>
-                    setData({
-                      ...data,
-                      phone:
-                        e.target.value,
-                    })
-                  }
-                  placeholder="e.g. +919876543210"
-                />
-              </label>
+                      <input
+                        type="text"
+                        value={contact.name}
+                        onChange={(e) =>
+                          updateContact(
+                            index,
+                            "name",
+                            e.target.value
+                          )
+                        }
+                        placeholder="e.g. Mom"
+                      />
+                    </label>
+
+                    <label>
+                      <span>Phone number</span>
+
+                      <input
+                        type="tel"
+                        value={contact.phone}
+                        onChange={(e) =>
+                          updateContact(
+                            index,
+                            "phone",
+                            e.target.value
+                          )
+                        }
+                        placeholder="e.g. +919876543210"
+                      />
+                    </label>
+                  </div>
+                ))}
+
+                {data.contacts.length < MAX_CONTACTS && (
+                  <button
+                    type="button"
+                    className="add-contact-button"
+                    onClick={addContact}
+                  >
+                    <Plus size={14} />
+                    Add another contact
+                  </button>
+                )}
+              </div>
 
               <label>
                 <span>
