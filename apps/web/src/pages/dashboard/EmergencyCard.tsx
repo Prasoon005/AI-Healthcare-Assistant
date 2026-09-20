@@ -11,6 +11,8 @@ import {
   X,
 } from "lucide-react";
 
+import { getHealthProfile } from "../../api/profile";
+
 interface EmergencyContact {
   name: string;
   phone: string;
@@ -68,7 +70,39 @@ const EmergencyCard = () => {
           "emergencyData"
         );
       }
+
+      return;
     }
+
+    // No local emergency data yet — seed the first
+    // contact from the health profile's emergency
+    // contact, without overwriting anything the user
+    // has already entered here.
+    getHealthProfile()
+      .then((result) => {
+        const emergencyName =
+          result.profile?.emergencyName?.trim();
+        const emergencyPhone =
+          result.profile?.emergencyPhone?.trim();
+
+        if (!emergencyName && !emergencyPhone) return;
+
+        setData({
+          ...defaultData,
+          contacts: [
+            {
+              name: emergencyName || "",
+              phone: emergencyPhone || "",
+            },
+          ],
+        });
+      })
+      .catch((error) => {
+        console.error(
+          "Failed to load health profile for emergency contact:",
+          error
+        );
+      });
   }, []);
 
   const updateContact = (

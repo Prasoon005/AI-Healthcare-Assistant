@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Activity,
   ArrowRight,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { getHealthProfile } from "../../api/profile";
 import MedicationReminder from "./MedicationReminder";
 import VitalsCard from "./VitalsCard";
 import RiskMatrix from "./RiskMatrix";
@@ -26,6 +27,24 @@ const Dashboard = () => {
   const [water, setWater] = useState(0);
   const [symptom, setSymptom] = useState("");
   const [symptomResult, setSymptomResult] = useState("");
+  const [profileCompletion, setProfileCompletion] =
+    useState<number | null>(null);
+
+  useEffect(() => {
+    const loadProfileCompletion = async () => {
+      try {
+        const result = await getHealthProfile();
+        setProfileCompletion(result.completion);
+      } catch (error) {
+        console.error(
+          "Failed to load profile completion:",
+          error
+        );
+      }
+    };
+
+    loadProfileCompletion();
+  }, []);
 
   const hour = new Date().getHours();
 
@@ -152,10 +171,20 @@ const Dashboard = () => {
           </div>
 
           <p>Health profile</p>
-          <h3>0%</h3>
+          <h3>
+            {profileCompletion === null
+              ? "—"
+              : `${profileCompletion}%`}
+          </h3>
 
           <small>
-            Add your health information for personalized insights.
+            {profileCompletion === null
+              ? "Loading your profile completion..."
+              : profileCompletion === 100
+              ? "Your health profile is fully complete."
+              : profileCompletion > 0
+              ? "Add more details for fuller personalization."
+              : "Add your health information for personalized insights."}
           </small>
         </div>
 
@@ -248,7 +277,15 @@ const Dashboard = () => {
 
             <div>
               <span>Health profile</span>
-              <strong>Incomplete</strong>
+              <strong>
+                {profileCompletion === null
+                  ? "Loading..."
+                  : profileCompletion === 100
+                  ? "Complete"
+                  : profileCompletion > 0
+                  ? `${profileCompletion}% complete`
+                  : "Incomplete"}
+              </strong>
             </div>
 
             <div>

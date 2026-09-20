@@ -7,6 +7,7 @@ import vitalRoutes from "./vital.routes";
 import riskRoutes from "./risk.routes";
 import documentRoutes from "./document.routes";
 import plannerRoutes from "./planner.routes";
+import profileRoutes from "./profile.routes";
 const router = Router();
 
 router.use("/auth", authRoutes);
@@ -19,4 +20,5 @@ router.use(
   documentRoutes
 );
 router.use("/planner", plannerRoutes);
+router.use("/profile", profileRoutes);
 export default router;
