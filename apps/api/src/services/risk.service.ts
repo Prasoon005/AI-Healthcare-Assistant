@@ -30,6 +30,7 @@ export const calculateRiskMatrix = async (
       available: false,
       items: [],
       completeness: 0,
+      overallWellnessScore: null,
     };
   }
 
@@ -208,10 +209,22 @@ export const calculateRiskMatrix = async (
     },
   ];
 
+  /*
+   * cardio/metabolic/recovery above are "attention needed" scores, where
+   * HIGHER means more lifestyle factors worth attention (worse). The
+   * dashboard's wellness indicator is the inverse of their average, so
+   * higher there reads as "better" - do not flip this without updating
+   * both meanings consistently.
+   */
+  const averageAttention =
+    (cardioScore + metabolicScore + recoveryScore) / 3;
+  const overallWellnessScore = Math.round(100 - averageAttention);
+
   return {
     available: true,
     completeness,
     items,
+    overallWellnessScore,
     disclaimer:
       "These indicators are lifestyle-based wellness signals, not medical diagnoses or disease probabilities.",
   };

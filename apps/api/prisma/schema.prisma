@@ -20,20 +20,22 @@ enum Gender {
 }
 
 model User {
-  id            String            @id @default(cuid())
-  name          String
-  email         String            @unique
-  password      String
-  role          UserRole          @default(USER)
-  isVerified    Boolean           @default(false)
-  profile       HealthProfile?
-  refreshTokens RefreshToken[]
-  medications   Medication[]
-  vitalLogs     VitalLog[]
-  documents     MedicalDocument[]
+  id             String            @id @default(cuid())
+  name           String
+  email          String            @unique
+  password       String
+  role           UserRole          @default(USER)
+  isVerified     Boolean           @default(false)
+  profile        HealthProfile?
+  refreshTokens  RefreshToken[]
+  medications    Medication[]
+  vitalLogs      VitalLog[]
+  documents      MedicalDocument[]
+  healthAnalyses HealthAnalysis[]
+  reminders      Reminder[]
 
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model RefreshToken {
@@ -41,91 +43,133 @@ model RefreshToken {
   token     String   @unique
   expiresAt DateTime
 
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
 
 model HealthProfile {
-  id                String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  age               Int?
-  gender            Gender?
+  age    Int?
+  gender Gender?
 
-  height            Float?
-  weight            Float?
+  height Float?
+  weight Float?
 
-  smoking           Boolean?
-  alcohol           Boolean?
+  smoking Boolean?
+  alcohol Boolean?
 
-  exerciseDays      Int?
-  sleepHours        Float?
+  exerciseDays Int?
+  sleepHours   Float?
 
   allergies         String?
   medicalConditions String?
   medications       String?
 
-  emergencyName     String?
-  emergencyPhone    String?
+  emergencyName  String?
+  emergencyPhone String?
 
-  userId            String   @unique
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Medication {
-  id           String          @id @default(cuid())
+  id           String   @id @default(cuid())
   name         String
   dosage       String
   instructions String?
   times        String[]
-  active       Boolean         @default(true)
+  active       Boolean  @default(true)
 
-  userId       String
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  logs         MedicationLog[]
+  logs MedicationLog[]
 
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model MedicationLog {
-  id            String      @id @default(cuid())
-  medicationId  String
-  medication    Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  id           String     @id @default(cuid())
+  medicationId String
+  medication   Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
 
   scheduledDate DateTime
   scheduledTime String
-  taken         Boolean     @default(false)
+  taken         Boolean   @default(false)
   takenAt       DateTime?
 
-  createdAt     DateTime    @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([medicationId, scheduledDate, scheduledTime])
 }
 
 model VitalLog {
-  id          String   @id @default(cuid())
-  heartRate   Int?
-  systolic    Int?
-  diastolic   Int?
-  spo2        Int?
-  recordedAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  heartRate  Int?
+  systolic   Int?
+  diastolic  Int?
+  spo2       Int?
+  recordedAt DateTime @default(now())
 
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId, recordedAt])
 }
 
+model HealthAnalysis {
+  id String @id @default(cuid())
+
+  concern           String
+  duration          String
+  severity          String
+  additionalContext String?
+
+  profileSnapshot Json?
+  aiResult        Json
+  urgencyLevel    String
+  hasPhoto        Boolean  @default(false)
+  helpful         Boolean?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  reminders Reminder[]
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model Reminder {
+  id    String  @id @default(cuid())
+  title String
+  note  String?
+
+  dueDate DateTime
+
+  analysisId String?
+  analysis   HealthAnalysis? @relation(fields: [analysisId], references: [id], onDelete: SetNull)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, dueDate])
+}
+
 model MedicalDocument {
-  id            String   @id @default(cuid())
+  id            String  @id @default(cuid())
   name          String
   originalName  String
   filePath      String
@@ -133,11 +177,11 @@ model MedicalDocument {
   fileSize      Int
   extractedText String?
 
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
 }

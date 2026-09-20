@@ -8,6 +8,8 @@ import riskRoutes from "./risk.routes";
 import documentRoutes from "./document.routes";
 import plannerRoutes from "./planner.routes";
 import profileRoutes from "./profile.routes";
+import analysisRoutes from "./analysis.routes";
+import reminderRoutes from "./reminder.routes";
 const router = Router();
 
 router.use("/auth", authRoutes);
@@ -21,4 +23,6 @@ router.use(
 );
 router.use("/planner", plannerRoutes);
 router.use("/profile", profileRoutes);
+router.use("/analysis", analysisRoutes);
+router.use("/reminders", reminderRoutes);
 export default router;
