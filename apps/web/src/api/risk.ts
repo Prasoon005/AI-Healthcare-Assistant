@@ -17,6 +17,7 @@ export interface RiskMatrixResponse {
   available: boolean;
   completeness: number;
   items: RiskItem[];
+  overallWellnessScore: number | null;
   disclaimer?: string;
 }
 

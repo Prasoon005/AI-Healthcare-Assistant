@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import {
   Activity,
+  AlertTriangle,
   ArrowRight,
   CalendarDays,
   ClipboardCheck,
+  Info,
   ShieldCheck,
   Sparkles,
   UserRound,
@@ -13,12 +15,20 @@ import {
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getHealthProfile } from "../../api/profile";
+import { getRiskMatrix } from "../../api/risk";
+import {
+  getAnalysisHistory,
+  runQuickSymptomCheck,
+  type HealthAnalysis,
+  type QuickCheckResult,
+} from "../../api/analysis";
 import MedicationReminder from "./MedicationReminder";
 import VitalsCard from "./VitalsCard";
 import RiskMatrix from "./RiskMatrix";
 import EmergencyCard from "./EmergencyCard";
 import MedicalVault from "./MedicalVault";
 import DailyPlanner from "./DailyPlanner";
+import FollowUpReminders from "./FollowUpReminders";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -26,9 +36,23 @@ const Dashboard = () => {
 
   const [water, setWater] = useState(0);
   const [symptom, setSymptom] = useState("");
-  const [symptomResult, setSymptomResult] = useState("");
   const [profileCompletion, setProfileCompletion] =
     useState<number | null>(null);
+
+  const [analysisHistory, setAnalysisHistory] = useState<HealthAnalysis[]>(
+    []
+  );
+  const [analysisLoading, setAnalysisLoading] = useState(true);
+  const latestAnalysis = analysisHistory[0] ?? null;
+
+  const [wellnessScore, setWellnessScore] = useState<number | null>(null);
+  const [wellnessLoading, setWellnessLoading] = useState(true);
+
+  const [quickCheckStatus, setQuickCheckStatus] = useState<
+    "idle" | "checking" | "result" | "needs-more" | "error"
+  >("idle");
+  const [quickCheckResult, setQuickCheckResult] =
+    useState<QuickCheckResult | null>(null);
 
   useEffect(() => {
     const loadProfileCompletion = async () => {
@@ -43,10 +67,79 @@ const Dashboard = () => {
       }
     };
 
+    const loadAnalysisHistory = async () => {
+      try {
+        const result = await getAnalysisHistory();
+        setAnalysisHistory(result);
+      } catch (error) {
+        console.error(
+          "Failed to load analysis history:",
+          error
+        );
+      } finally {
+        setAnalysisLoading(false);
+      }
+    };
+
+    const loadWellnessScore = async () => {
+      try {
+        const result = await getRiskMatrix();
+        setWellnessScore(result.overallWellnessScore);
+      } catch (error) {
+        console.error("Failed to load wellness score:", error);
+      } finally {
+        setWellnessLoading(false);
+      }
+    };
+
     loadProfileCompletion();
+    loadAnalysisHistory();
+    loadWellnessScore();
   }, []);
 
+  const formatRelativeDate = (isoDate: string) => {
+    const date = new Date(isoDate);
+    const days = Math.floor(
+      (Date.now() - date.getTime()) / 86400000
+    );
+
+    if (days <= 0) return "Today";
+    if (days === 1) return "Yesterday";
+    if (days < 7) return `${days} days ago`;
+
+    return date.toLocaleDateString();
+  };
+
+  const URGENCY_STATUS_LABEL: Record<string, string> = {
+    routine: "Routine",
+    soon: "Check in soon",
+    urgent: "Seek care promptly",
+  };
+
   const hour = new Date().getHours();
+
+  const timeOfDayGreeting =
+    hour < 12
+      ? "Good morning"
+      : hour < 18
+      ? "Good afternoon"
+      : "Good evening";
+
+  const greetingMessages = [
+    { text: `Hello, ${firstName}`, emoji: "👋" },
+    { text: timeOfDayGreeting, emoji: hour < 12 ? "☀️" : hour < 18 ? "🌤️" : "🌙" },
+    { text: "How can we help you today?", emoji: "💬" },
+  ];
+
+  const [greetingIndex, setGreetingIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGreetingIndex((prev) => (prev + 1) % greetingMessages.length);
+    }, 3200);
+
+    return () => clearInterval(interval);
+  }, [greetingMessages.length]);
 
   const dailyTip =
     hour < 12
@@ -55,14 +148,38 @@ const Dashboard = () => {
       ? "Take a short movement break and stay hydrated."
       : "Wind down early and give your body enough time to rest.";
 
-  const checkSymptom = (e: React.FormEvent) => {
+  const checkSymptom = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!symptom.trim()) return;
+    const trimmed = symptom.trim();
+    if (!trimmed || quickCheckStatus === "checking") return;
 
-    setSymptomResult(
-      "This is an educational quick check. For a detailed assessment, use Health Analysis."
-    );
+    try {
+      setQuickCheckStatus("checking");
+      setQuickCheckResult(null);
+
+      const result = await runQuickSymptomCheck(trimmed);
+
+      setQuickCheckResult(result);
+      setQuickCheckStatus(
+        result.needsFullAnalysis ? "needs-more" : "result"
+      );
+    } catch (error) {
+      console.error("Quick symptom check failed:", error);
+      setQuickCheckStatus("error");
+    }
+  };
+
+  const resetQuickCheck = () => {
+    setSymptom("");
+    setQuickCheckStatus("idle");
+    setQuickCheckResult(null);
+  };
+
+  const QUICK_URGENCY_CLASS: Record<string, "low" | "moderate" | "high"> = {
+    routine: "low",
+    soon: "moderate",
+    urgent: "high",
   };
 
   return (
@@ -83,9 +200,9 @@ const Dashboard = () => {
       <section className="welcome-section">
         <p>Good to see you</p>
 
-        <h1>
-          Hello, {firstName}
-          <span>👋</span>
+        <h1 key={greetingIndex} className="animated-greeting">
+          {greetingMessages[greetingIndex].text}
+          <span>{greetingMessages[greetingIndex].emoji}</span>
         </h1>
 
         <div className="welcome-meta">
@@ -126,13 +243,104 @@ const Dashboard = () => {
               value={symptom}
               onChange={(e) => setSymptom(e.target.value)}
               placeholder="Quick symptom check..."
+              maxLength={100}
             />
 
-            <button type="submit">Check</button>
+            <button
+              type="submit"
+              disabled={quickCheckStatus === "checking"}
+            >
+              {quickCheckStatus === "checking" ? "Checking..." : "Check"}
+            </button>
           </form>
 
-          {symptomResult && (
-            <p className="symptom-result">{symptomResult}</p>
+          {quickCheckStatus === "error" && (
+            <div className="quick-check-result error">
+              <Info size={14} />
+              <div>
+                <p>
+                  Quick check is temporarily unavailable. Please try again
+                  in a moment.
+                </p>
+                <Link to="/analysis" className="quick-check-cta">
+                  Start Health Analysis
+                  <ArrowRight size={13} />
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {quickCheckStatus === "needs-more" && quickCheckResult && (
+            <div className="quick-check-result needs-more">
+              <AlertTriangle size={14} />
+              <div>
+                <p>{quickCheckResult.summary}</p>
+                {quickCheckResult.whenToSeekCare.map((item, index) => (
+                  <p key={index} className="quick-check-subtext">
+                    {item}
+                  </p>
+                ))}
+                <Link to="/analysis" className="quick-check-cta">
+                  Start Health Analysis
+                  <ArrowRight size={13} />
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {quickCheckStatus === "result" && quickCheckResult && (
+            <div
+              className={`quick-check-result ${
+                QUICK_URGENCY_CLASS[quickCheckResult.urgencyLevel]
+              }`}
+            >
+              <div className="quick-check-body">
+                <p className="quick-check-summary">
+                  {quickCheckResult.summary}
+                </p>
+
+                {quickCheckResult.considerations.length > 0 && (
+                  <ul className="quick-check-list">
+                    {quickCheckResult.considerations.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+
+                {quickCheckResult.generalGuidance.length > 0 && (
+                  <ul className="quick-check-list">
+                    {quickCheckResult.generalGuidance.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+
+                {quickCheckResult.whenToSeekCare.length > 0 && (
+                  <p className="quick-check-subtext">
+                    {quickCheckResult.whenToSeekCare[0]}
+                  </p>
+                )}
+
+                <p className="quick-check-disclaimer">
+                  {quickCheckResult.disclaimer}
+                </p>
+
+                <div className="quick-check-actions">
+                  <Link to="/analysis" className="quick-check-cta">
+                    Get a full analysis
+                    <ArrowRight size={13} />
+                  </Link>
+
+                  <button
+                    type="button"
+                    className="quick-check-reset"
+                    onClick={resetQuickCheck}
+                  >
+                    Check another symptom
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
 
@@ -150,14 +358,32 @@ const Dashboard = () => {
               <ShieldCheck size={19} />
             </div>
 
-            <span>Not assessed</span>
+            <span>
+              {wellnessLoading
+                ? "Loading..."
+                : wellnessScore === null
+                ? "Not assessed"
+                : wellnessScore >= 70
+                ? "Good"
+                : wellnessScore >= 40
+                ? "Fair"
+                : "Needs attention"}
+            </span>
           </div>
 
-          <p>Health score</p>
-          <h3>—</h3>
+          <p>Wellness indicator</p>
+          <h3>
+            {wellnessLoading
+              ? "—"
+              : wellnessScore === null
+              ? "—"
+              : wellnessScore}
+          </h3>
 
           <small>
-            Complete your first analysis to generate your health score.
+            {wellnessScore === null
+              ? "Complete your health profile to generate a wellness indicator."
+              : "A lifestyle indicator from your Preventive Wellness data, not a medical score."}
           </small>
         </div>
 
@@ -188,7 +414,14 @@ const Dashboard = () => {
           </small>
         </div>
 
-        <div className="stat-card glass-card">
+        <Link
+          to={
+            latestAnalysis
+              ? `/analysis?id=${latestAnalysis.id}`
+              : "/analysis"
+          }
+          className="stat-card glass-card"
+        >
           <div className="stat-top">
             <div className="stat-icon purple">
               <CalendarDays size={19} />
@@ -198,10 +431,24 @@ const Dashboard = () => {
           </div>
 
           <p>Last analysis</p>
-          <h3>—</h3>
+          <h3>
+            {analysisLoading
+              ? "—"
+              : latestAnalysis
+              ? formatRelativeDate(latestAnalysis.createdAt)
+              : "—"}
+          </h3>
 
-          <small>Your health analysis history will appear here.</small>
-        </div>
+          <small>
+            {analysisLoading
+              ? "Loading your analysis history..."
+              : latestAnalysis
+              ? latestAnalysis.concern.length > 60
+                ? `${latestAnalysis.concern.slice(0, 60)}…`
+                : latestAnalysis.concern
+              : "Your health analysis history will appear here."}
+          </small>
+        </Link>
       </section>
 
       {/* Widgets */}
@@ -272,7 +519,14 @@ const Dashboard = () => {
           <div className="snapshot-list">
             <div>
               <span>Overall status</span>
-              <strong>Not assessed</strong>
+              <strong>
+                {analysisLoading
+                  ? "Loading..."
+                  : latestAnalysis
+                  ? URGENCY_STATUS_LABEL[latestAnalysis.urgencyLevel] ??
+                    "Assessed"
+                  : "Not assessed"}
+              </strong>
             </div>
 
             <div>
@@ -290,12 +544,21 @@ const Dashboard = () => {
 
             <div>
               <span>Last assessment</span>
-              <strong>No data</strong>
+              <strong>
+                {analysisLoading
+                  ? "Loading..."
+                  : latestAnalysis
+                  ? formatRelativeDate(latestAnalysis.createdAt)
+                  : "No data"}
+              </strong>
             </div>
           </div>
 
-          <Link to="/profile" className="secondary-action">
-            Complete profile
+          <Link
+            to={latestAnalysis ? `/analysis?id=${latestAnalysis.id}` : "/profile"}
+            className="secondary-action"
+          >
+            {latestAnalysis ? "View last analysis" : "Complete profile"}
             <ArrowRight size={15} />
           </Link>
         </div>
@@ -303,6 +566,8 @@ const Dashboard = () => {
 
       {/* Medication Reminder Widget */}
       <MedicationReminder />
+
+      <FollowUpReminders />
 
       <VitalsCard />
 
@@ -326,17 +591,70 @@ const Dashboard = () => {
             <Activity size={18} />
           </div>
 
-          <div className="empty-state">
-            <div>
-              <Activity size={21} />
+          {analysisLoading ? (
+            <div className="empty-state">
+              <p>Loading your recent activity...</p>
             </div>
+          ) : analysisHistory.length > 0 ? (
+            <>
+              <div className="activity-list">
+                {analysisHistory.slice(0, 5).map((entry) => (
+                  <Link
+                    key={entry.id}
+                    to={`/analysis?id=${entry.id}`}
+                    className="activity-item"
+                  >
+                    <div className="activity-item-icon">
+                      <ClipboardCheck size={17} />
+                    </div>
 
-            <strong>No activity yet</strong>
+                    <div className="activity-item-content">
+                      <strong>
+                        {entry.concern.length > 70
+                          ? `${entry.concern.slice(0, 70)}…`
+                          : entry.concern}
+                      </strong>
+                      <span>
+                        Health analysis ·{" "}
+                        {formatRelativeDate(entry.createdAt)}
+                      </span>
+                    </div>
 
-            <p>
-              Complete an analysis to start building your health history.
-            </p>
-          </div>
+                    <span
+                      className={`risk-badge ${
+                        entry.urgencyLevel === "routine"
+                          ? "low"
+                          : entry.urgencyLevel === "soon"
+                          ? "moderate"
+                          : "high"
+                      }`}
+                    >
+                      {URGENCY_STATUS_LABEL[entry.urgencyLevel]}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+
+              {analysisHistory.length > 5 && (
+                <Link to="/analysis" className="secondary-action">
+                  View all analyses
+                  <ArrowRight size={15} />
+                </Link>
+              )}
+            </>
+          ) : (
+            <div className="empty-state">
+              <div>
+                <Activity size={21} />
+              </div>
+
+              <strong>No activity yet</strong>
+
+              <p>
+                Complete an analysis to start building your health history.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="privacy-card glass-card">
