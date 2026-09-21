@@ -311,7 +311,7 @@ Set in `apps/api/.env` (see `apps/api/.env.example`):
 
 ## License
 
-No license has been formally chosen for this project yet — there's currently no `LICENSE` file in the repository. Add one (MIT is a common default for a portfolio project like this) before treating any part of this code as reusable by others.
+No license has been formally chosen for this project yet .
 
 ---
 
