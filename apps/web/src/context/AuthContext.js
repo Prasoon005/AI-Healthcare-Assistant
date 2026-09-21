@@ -31,12 +31,22 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("user");
         setUser(null);
     };
+    const updateUser = (updates) => {
+        setUser((prev) => {
+            if (!prev)
+                return prev;
+            const next = { ...prev, ...updates };
+            localStorage.setItem("user", JSON.stringify(next));
+            return next;
+        });
+    };
     return (_jsx(AuthContext.Provider, { value: {
             user,
             isAuthenticated: !!user,
             loading,
             login,
             logout,
+            updateUser,
         }, children: children }));
 };
 export const useAuth = () => {

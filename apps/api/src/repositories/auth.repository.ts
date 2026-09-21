@@ -62,3 +62,11 @@ export const deleteRefreshToken = (token: string) => {
     },
   });
 };
+
+export const deleteAllRefreshTokensForUser = (userId: string) => {
+  return prisma.refreshToken.deleteMany({
+    where: {
+      userId,
+    },
+  });
+};

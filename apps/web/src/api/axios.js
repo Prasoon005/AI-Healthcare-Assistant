@@ -15,4 +15,49 @@ api.interceptors.request.use((config) => {
 }, (error) => {
     return Promise.reject(error);
 });
+const clearSessionAndRedirect = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+    }
+};
+let refreshPromise = null;
+const refreshAccessToken = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken)
+        return null;
+    if (!refreshPromise) {
+        refreshPromise = axios
+            .post("http://localhost:5000/api/auth/refresh", { refreshToken })
+            .then((response) => {
+            const newAccessToken = response.data?.data?.accessToken;
+            localStorage.setItem("accessToken", newAccessToken);
+            return newAccessToken;
+        })
+            .catch(() => null)
+            .finally(() => {
+            refreshPromise = null;
+        });
+    }
+    return refreshPromise;
+};
+api.interceptors.response.use((response) => response, async (error) => {
+    const originalRequest = error.config;
+    const isAuthEndpoint = typeof originalRequest?.url === "string" &&
+        originalRequest.url.includes("/auth/");
+    if (error.response?.status === 401 &&
+        !originalRequest?._retry &&
+        !isAuthEndpoint) {
+        originalRequest._retry = true;
+        const newAccessToken = await refreshAccessToken();
+        if (newAccessToken) {
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+            return api(originalRequest);
+        }
+        clearSessionAndRedirect();
+    }
+    return Promise.reject(error);
+});
 export default api;

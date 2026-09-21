@@ -18,6 +18,7 @@ interface AuthContextType {
   loading: boolean;
   login: (user: User, accessToken: string, refreshToken: string) => void;
   logout: () => void;
+  updateUser: (updates: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,6 +68,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
   };
 
+  const updateUser = (updates: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+
+      const next = { ...prev, ...updates };
+      localStorage.setItem("user", JSON.stringify(next));
+
+      return next;
+    });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -75,6 +87,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         loading,
         login,
         logout,
+        updateUser,
       }}
     >
       {children}

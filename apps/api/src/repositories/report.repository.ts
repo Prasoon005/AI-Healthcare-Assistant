@@ -43,6 +43,16 @@ export const findReportsByUser = async (userId: string) => {
   });
 };
 
+export const findAllReportsFullByUser = async (userId: string) => {
+  return prisma.healthReport.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    include: {
+      questions: { orderBy: { createdAt: "asc" } },
+    },
+  });
+};
+
 export const findLatestReportSummaryByUser = async (userId: string) => {
   return prisma.healthReport.findFirst({
     where: { userId },
