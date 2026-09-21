@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import bgArtwork from "../../assets/bg-artwork.png";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import ThemeToggle from "../../components/common/ThemeToggle";
 const Login = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
@@ -41,170 +42,11 @@ const Login = () => {
             setLoading(false);
         }
     };
-    return (_jsxs("div", { style: {
-            minHeight: "100vh",
-            width: "100%",
-            position: "relative",
-            overflow: "hidden",
-            fontFamily: "sans-serif",
-            color: "#18181b",
-            backgroundImage: `url(${bgArtwork})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-        }, children: [_jsxs("header", { style: {
-                    height: "68px",
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "0 40px",
-                    backgroundColor: "rgba(255,255,255,0.12)",
-                    backdropFilter: "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
-                    borderBottom: "1px solid rgba(255,255,255,0.3)",
-                    boxSizing: "border-box",
-                }, children: [_jsxs(Link, { to: "/", style: {
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                            textDecoration: "none",
-                            color: "#18181b",
-                        }, children: [_jsx("div", { style: {
-                                    width: "32px",
-                                    height: "32px",
-                                    borderRadius: "50%",
-                                    backgroundColor: "#18181b",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }, children: _jsx(HeartPulse, { size: 18, color: "#ffffff" }) }), _jsxs("span", { style: {
-                                    fontWeight: 700,
-                                    fontSize: "16px",
-                                }, children: ["Health", _jsx("span", { style: { color: "#0d9488" }, children: "AI" })] })] }), _jsx(Link, { to: "/register", style: {
-                            padding: "8px 20px",
-                            borderRadius: "22px",
-                            backgroundColor: "#09090b",
-                            color: "#ffffff",
-                            textDecoration: "none",
-                            fontSize: "13px",
-                            fontWeight: 600,
-                        }, children: "Sign up" })] }), _jsx("main", { style: {
-                    minHeight: "calc(100vh - 68px)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "40px 20px",
-                    boxSizing: "border-box",
-                }, children: _jsxs("div", { style: {
-                        width: "100%",
-                        maxWidth: "430px",
-                        padding: "44px",
-                        borderRadius: "32px",
-                        backgroundColor: "rgba(255,255,255,0.18)",
-                        backdropFilter: "blur(18px)",
-                        WebkitBackdropFilter: "blur(18px)",
-                        border: "1px solid rgba(255,255,255,0.55)",
-                        boxShadow: "0 24px 70px rgba(0,0,0,0.08), inset 0 1px 2px rgba(255,255,255,0.5)",
-                        boxSizing: "border-box",
-                    }, children: [_jsxs("div", { style: { marginBottom: "32px" }, children: [_jsx("p", { style: {
-                                        margin: "0 0 8px",
-                                        fontSize: "13px",
-                                        fontWeight: 600,
-                                        color: "#475569",
-                                    }, children: "Welcome back" }), _jsx("h1", { style: {
-                                        margin: 0,
-                                        fontSize: "38px",
-                                        lineHeight: "1.1",
-                                        letterSpacing: "-1.2px",
-                                        fontWeight: 800,
-                                        color: "#09090b",
-                                    }, children: "Sign in to HealthAI" }), _jsx("p", { style: {
-                                        margin: "12px 0 0",
-                                        fontSize: "14px",
-                                        lineHeight: "1.6",
-                                        color: "#475569",
-                                    }, children: "Continue to your personal health dashboard." })] }), _jsxs("form", { onSubmit: handleSubmit, style: {
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "20px",
-                            }, children: [_jsxs("div", { children: [_jsx("label", { style: {
-                                                display: "block",
-                                                marginBottom: "8px",
-                                                fontSize: "13px",
-                                                fontWeight: 600,
-                                                color: "#334155",
-                                            }, children: "Email address" }), _jsx("input", { type: "email", value: email, onChange: (e) => setEmail(e.target.value), placeholder: "you@example.com", disabled: loading, style: {
-                                                width: "100%",
-                                                height: "48px",
-                                                padding: "0 16px",
-                                                borderRadius: "14px",
-                                                border: "1px solid rgba(255,255,255,0.65)",
-                                                backgroundColor: "rgba(255,255,255,0.28)",
-                                                outline: "none",
-                                                fontSize: "14px",
-                                                color: "#09090b",
-                                                boxSizing: "border-box",
-                                            } })] }), _jsxs("div", { children: [_jsxs("div", { style: {
-                                                display: "flex",
-                                                justifyContent: "space-between",
-                                                alignItems: "center",
-                                                marginBottom: "8px",
-                                            }, children: [_jsx("label", { style: {
-                                                        fontSize: "13px",
-                                                        fontWeight: 600,
-                                                        color: "#334155",
-                                                    }, children: "Password" }), _jsx("button", { type: "button", style: {
-                                                        border: "none",
-                                                        background: "none",
-                                                        padding: 0,
-                                                        fontSize: "12px",
-                                                        color: "#475569",
-                                                        cursor: "pointer",
-                                                    }, children: "Forgot password?" })] }), _jsx("input", { type: "password", value: password, onChange: (e) => setPassword(e.target.value), placeholder: "Enter your password", disabled: loading, style: {
-                                                width: "100%",
-                                                height: "48px",
-                                                padding: "0 16px",
-                                                borderRadius: "14px",
-                                                border: "1px solid rgba(255,255,255,0.65)",
-                                                backgroundColor: "rgba(255,255,255,0.28)",
-                                                outline: "none",
-                                                fontSize: "14px",
-                                                color: "#09090b",
-                                                boxSizing: "border-box",
-                                            } })] }), error && (_jsx("div", { style: {
-                                        padding: "12px 14px",
-                                        borderRadius: "12px",
-                                        backgroundColor: "rgba(254,226,226,0.7)",
-                                        border: "1px solid rgba(248,113,113,0.4)",
-                                        color: "#b91c1c",
-                                        fontSize: "12px",
-                                        fontWeight: 600,
-                                    }, children: error })), _jsxs("button", { type: "submit", disabled: loading, style: {
-                                        width: "100%",
-                                        height: "50px",
-                                        marginTop: "4px",
-                                        border: "none",
-                                        borderRadius: "15px",
-                                        backgroundColor: "#09090b",
-                                        color: "#ffffff",
-                                        fontSize: "14px",
-                                        fontWeight: 600,
-                                        cursor: loading ? "not-allowed" : "pointer",
-                                        opacity: loading ? 0.65 : 1,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        gap: "8px",
-                                    }, children: [loading ? "Signing in..." : "Sign in", !loading && _jsx(ArrowRight, { size: 17 })] })] }), _jsxs("p", { style: {
-                                margin: "28px 0 0",
-                                textAlign: "center",
-                                fontSize: "13px",
-                                color: "#475569",
-                            }, children: ["Don't have an account?", " ", _jsx(Link, { to: "/register", style: {
-                                        color: "#09090b",
-                                        fontWeight: 700,
-                                        textDecoration: "none",
-                                    }, children: "Create one" })] })] }) })] }));
+    return (_jsxs("div", { className: "relative min-h-screen w-full overflow-hidden text-slate-900 dark:text-zinc-100", children: [_jsx("div", { className: "fixed inset-0 -z-10 dark:brightness-[0.32] dark:saturate-[1.15]", style: {
+                    backgroundImage: `url(${bgArtwork})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                } }), _jsxs("header", { className: "flex h-[68px] items-center justify-between border-b border-white/30 bg-white/15 px-5 backdrop-blur-xl dark:border-white/10 dark:bg-black/40 sm:px-10", children: [_jsxs(Link, { to: "/", className: "flex items-center gap-3 no-underline", children: [_jsx("div", { className: "flex h-9 w-9 items-center justify-center rounded-full bg-[#09090b] dark:bg-zinc-100", children: _jsx(HeartPulse, { size: 18, className: "text-white dark:text-zinc-900" }) }), _jsxs("span", { className: "text-base font-bold tracking-tight text-[#18181b] dark:text-zinc-100", children: ["Health", _jsx("span", { className: "text-teal-600 dark:text-teal-400", children: "AI" })] })] }), _jsxs("div", { className: "flex items-center gap-4", children: [_jsx(ThemeToggle, { className: "flex h-8 w-8 items-center justify-center rounded-full border border-white/50 bg-white/25 text-slate-600 transition hover:bg-white/40 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10" }), _jsx(Link, { to: "/register", className: "rounded-full bg-[#09090b] px-5 py-2 text-sm font-semibold text-white no-underline dark:bg-zinc-100 dark:text-zinc-900", children: "Sign up" })] })] }), _jsx("main", { className: "flex min-h-[calc(100vh-68px)] items-center justify-center px-5 py-10", children: _jsxs("div", { className: "w-full max-w-[430px] rounded-[32px] border border-white/55 bg-white/18 p-11 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/55", children: [_jsxs("div", { className: "mb-8", children: [_jsx("p", { className: "mb-2 text-sm font-semibold text-slate-600 dark:text-zinc-400", children: "Welcome back" }), _jsx("h1", { className: "text-4xl font-extrabold leading-[1.1] tracking-[-1.2px] text-[#09090b] dark:text-zinc-100", children: "Sign in to HealthAI" }), _jsx("p", { className: "mt-3 text-sm leading-6 text-slate-600 dark:text-zinc-400", children: "Continue to your personal health dashboard." })] }), _jsxs("form", { onSubmit: handleSubmit, className: "flex flex-col gap-5", children: [_jsxs("div", { children: [_jsx("label", { htmlFor: "login-email", className: "mb-2 block text-sm font-semibold text-slate-700 dark:text-zinc-300", children: "Email address" }), _jsx("input", { id: "login-email", type: "email", value: email, onChange: (e) => setEmail(e.target.value), placeholder: "you@example.com", disabled: loading, className: "h-12 w-full rounded-2xl border border-white/65 bg-white/28 px-4 text-sm text-[#09090b] outline-none dark:border-white/10 dark:bg-white/5 dark:text-zinc-100 dark:placeholder:text-zinc-500" })] }), _jsxs("div", { children: [_jsxs("div", { className: "mb-2 flex items-center justify-between", children: [_jsx("label", { htmlFor: "login-password", className: "text-sm font-semibold text-slate-700 dark:text-zinc-300", children: "Password" }), _jsx("button", { type: "button", className: "border-0 bg-transparent p-0 text-xs text-slate-600 dark:text-zinc-400", children: "Forgot password?" })] }), _jsx("input", { id: "login-password", type: "password", value: password, onChange: (e) => setPassword(e.target.value), placeholder: "Enter your password", disabled: loading, className: "h-12 w-full rounded-2xl border border-white/65 bg-white/28 px-4 text-sm text-[#09090b] outline-none dark:border-white/10 dark:bg-white/5 dark:text-zinc-100 dark:placeholder:text-zinc-500" })] }), error && (_jsx("div", { className: "rounded-xl border border-red-400/40 bg-red-100/70 px-3.5 py-3 text-xs font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400", children: error })), _jsxs("button", { type: "submit", disabled: loading, className: "mt-1 flex h-[50px] w-full items-center justify-center gap-2 rounded-2xl border-0 bg-[#09090b] text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-65 dark:bg-zinc-100 dark:text-zinc-900", children: [loading ? "Signing in..." : "Sign in", !loading && _jsx(ArrowRight, { size: 17 })] })] }), _jsxs("p", { className: "mt-7 text-center text-sm text-slate-600 dark:text-zinc-400", children: ["Don't have an account?", " ", _jsx(Link, { to: "/register", className: "font-bold text-[#09090b] no-underline dark:text-zinc-100", children: "Create one" })] })] }) })] }));
 };
 export default Login;

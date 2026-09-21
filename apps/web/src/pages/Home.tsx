@@ -1,266 +1,73 @@
-import { HeartPulse, Search, ChevronDown } from "lucide-react";
+import { HeartPulse, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import bgArtwork from "../assets/bg-artwork.png";
+import LanguageSelector from "../components/landing/LanguageSelector";
+import ThemeToggle from "../components/common/ThemeToggle";
+import HealthShowcase from "../components/landing/HealthShowcase";
+import "./Home.css";
 
 const Home = () => {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        width: "100vw",
-        position: "relative",
-        overflow: "hidden",
-        fontFamily: "sans-serif",
-        color: "#18181b",
-        display: "flex",
-        flexDirection: "column",
-        backgroundImage: `url(${bgArtwork})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          height: "64px",
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 40px",
-          backgroundColor: "rgba(255, 255, 255, 0.12)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.3)",
-          zIndex: 30,
-          boxSizing: "border-box",
-        }}
-      >
-        {/* Logo */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "50%",
-              backgroundColor: "#18181b",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <HeartPulse size={18} color="#ffffff" />
-          </div>
+    <div className="landing-page">
+      <div
+        className="landing-bg"
+        style={{ backgroundImage: `url(${bgArtwork})` }}
+      />
+      <div className="landing-bg-overlay" />
 
-          <span
-            style={{
-              fontWeight: 700,
-              fontSize: "16px",
-              letterSpacing: "-0.5px",
-            }}
-          >
-            Health<span style={{ color: "#0d9488" }}>AI</span>
+      <header className="landing-navbar">
+        <div className="landing-logo">
+          <div className="landing-logo-mark">
+            <HeartPulse size={18} />
+          </div>
+          <span>
+            Health<span className="landing-logo-accent">AI</span>
           </span>
         </div>
 
-        {/* Header Actions */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "16px",
-          }}
-        >
-          {/* Search */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              backgroundColor: "rgba(255, 255, 255, 0.25)",
-              padding: "6px 14px",
-              borderRadius: "20px",
-              border: "1px solid rgba(255, 255, 255, 0.4)",
-            }}
-          >
-            <Search size={14} color="#334155" />
-
-            <input
-              type="text"
-              placeholder="Search"
-              style={{
-                border: "none",
-                outline: "none",
-                background: "transparent",
-                fontSize: "12px",
-                width: "80px",
-              }}
-            />
+        <div className="landing-navbar-actions">
+          <div className="landing-search">
+            <Search size={14} />
+            <input type="text" placeholder="Search" />
           </div>
 
-          {/* Language */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-              fontSize: "12px",
-              fontWeight: 500,
-              color: "#334155",
-              cursor: "pointer",
-            }}
-          >
-            <span>English (United States)</span>
-            <ChevronDown size={14} />
-          </div>
+          <LanguageSelector />
 
-          {/* Login */}
-          <Link
-            to="/login"
-            style={{
-              padding: "6px 18px",
-              borderRadius: "20px",
-              border: "1px solid rgba(255, 255, 255, 0.5)",
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
-              fontSize: "12px",
-              fontWeight: 600,
-              color: "#0f172a",
-              textDecoration: "none",
-            }}
-          >
+          <ThemeToggle />
+
+          <Link to="/login" className="landing-login-button">
             Log in
           </Link>
 
-          {/* Sign Up */}
-          <Link
-            to="/register"
-            style={{
-              padding: "6px 18px",
-              borderRadius: "20px",
-              backgroundColor: "#09090b",
-              fontSize: "12px",
-              fontWeight: 600,
-              color: "#ffffff",
-              textDecoration: "none",
-            }}
-          >
+          <Link to="/register" className="landing-signup-button">
             Sign up
           </Link>
         </div>
       </header>
 
-      {/* Main Content */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          padding: "0 80px",
-          zIndex: 10,
-        }}
-      >
-        {/* Glass Panel */}
-        <div
-          style={{
-            width: "520px",
-            padding: "52px",
-            borderRadius: "36px",
-            backgroundColor: "rgba(255, 255, 255, 0.03)",
-            backdropFilter: "blur(8px) contrast(105%)",
-            WebkitBackdropFilter: "blur(8px) contrast(105%)",
-            border: "1px solid rgba(255, 255, 255, 0.55)",
-            boxShadow:
-              "0 20px 40px rgba(0, 0, 0, 0.03), inset 0 1px 2px rgba(255, 255, 255, 0.4)",
-            boxSizing: "border-box",
-          }}
-        >
-          <h1
-            style={{
-              fontSize: "44px",
-              fontWeight: 800,
-              lineHeight: "1.12",
-              margin: 0,
-              color: "#09090b",
-              letterSpacing: "-1.2px",
-            }}
-          >
+      <main className="landing-hero">
+        <div className="landing-hero-panel">
+          <h1>
             Understand your <br />
             health. <br />
             Explore with us
           </h1>
 
-          <p
-            style={{
-              marginTop: "24px",
-              marginBottom: "36px",
-              fontSize: "14px",
-              lineHeight: "1.65",
-              color: "#334155",
-              maxWidth: "380px",
-              fontWeight: 500,
-            }}
-          >
+          <p>
             HealthAI helps you track symptoms, organize health records, and
             discover personalized wellness insights — all in one secure
             platform.
           </p>
 
-          {/* Signup Bar */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.18)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
-              border: "1px solid rgba(255, 255, 255, 0.6)",
-              borderRadius: "40px",
-              padding: "4px 4px 4px 18px",
-              maxWidth: "380px",
-              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.02)",
-            }}
-          >
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              style={{
-                flex: 1,
-                border: "none",
-                outline: "none",
-                background: "transparent",
-                fontSize: "13px",
-                color: "#0f172a",
-                fontWeight: 500,
-              }}
-            />
+          <div className="landing-signup-bar">
+            <input type="email" placeholder="Enter your email address" />
 
-            <Link
-              to="/register"
-              style={{
-                backgroundColor: "#09090b",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "30px",
-                padding: "10px 24px",
-                fontSize: "13px",
-                fontWeight: 600,
-                cursor: "pointer",
-                textDecoration: "none",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Sign up
-            </Link>
+            <Link to="/register">Sign up</Link>
           </div>
         </div>
-      </div>
+
+        <HealthShowcase />
+      </main>
     </div>
   );
 };

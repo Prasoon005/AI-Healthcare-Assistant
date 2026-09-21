@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Route Tailwind's dark: variant through our manual data-theme toggle
+   instead of the OS-only prefers-color-scheme default, so Login/Register
+   (styled with Tailwind utilities) follow the same toggle as every other
+   page instead of only ever reacting to the system theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @layer base {
   :root {
     color-scheme: dark;
@@ -340,6 +346,26 @@
   font-size: 14px;
   font-weight: 800;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+}
+
+.dashboard-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.25);
+  color: #52657f;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
 }
 
 .dashboard-content {
@@ -5262,4 +5288,362 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* =====================================================================
+   DASHBOARD DARK MODE
+
+   The rest of this file is a light glass-on-photo theme with colors
+   mostly hardcoded rather than routed through variables, so a full dark
+   mode needs explicit overrides rather than a variable flip alone.
+   Grouped by the shape of the fix rather than by page, since the same
+   handful of literal values (subtle dark-ink card tints, light glass
+   inputs/buttons, muted gray text) repeat across almost every widget:
+     1. Root tokens + ambient/background layers
+     2. Sidebar/header (uses .glass-panel, only needs text/icon tweaks)
+     3. Shared card/tile surfaces (.glass-card + every "subtle tinted
+        tile" background used by activity items, risk items, report
+        tiles, history cards, etc.)
+     4. Shared muted-text color group (every place a page hardcodes one
+        of the recurring gray hex values instead of var(--muted))
+     5. Shared primary-text color group (hardcoded #09090b instead of
+        var(--text))
+     6. Light-only inputs/buttons that need a dark surface
+     7. Per-widget touch-ups that don't fit the shared groups
+   Modals that were already deliberately dark in both themes
+   (.vital-modal, .medical-modal, .document-modal, .analysis-hero) are
+   untouched - they already read correctly against a dark shell.
+===================================================================== */
+
+/* 1. Root tokens + ambient/background layers */
+
+[data-theme="dark"] body {
+  background: #0a0a0f;
+}
+
+[data-theme="dark"] .dashboard-shell {
+  --glass: rgba(32, 33, 46, 0.55);
+  --glass-strong: rgba(40, 41, 58, 0.68);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text: #f4f4f5;
+  --muted: #a1a1aa;
+}
+
+[data-theme="dark"] .dashboard-shell::before {
+  background: linear-gradient(
+    120deg,
+    rgba(30, 27, 55, 0.55),
+    rgba(10, 10, 16, 0.2) 45%,
+    rgba(20, 22, 40, 0.4)
+  );
+}
+
+[data-theme="dark"] .dashboard-shell::after {
+  background: radial-gradient(
+    circle at var(--mouse-x) var(--mouse-y),
+    rgba(255, 255, 255, 0.07),
+    transparent 230px
+  );
+}
+
+[data-theme="dark"] .cursor-glow {
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.09),
+    rgba(255, 255, 255, 0.02) 42%,
+    transparent 72%
+  );
+}
+
+/* 2. Sidebar / header */
+
+[data-theme="dark"] .sidebar-brand {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .brand-link {
+  color: var(--text);
+}
+
+[data-theme="dark"] .brand-icon {
+  background: #f4f4f5;
+  color: #09090b;
+}
+
+[data-theme="dark"] .nav-item {
+  color: #a1a1aa;
+}
+
+[data-theme="dark"] .nav-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+}
+
+[data-theme="dark"] .nav-item.active {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), inset 0 1px rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .logout-button {
+  background: rgba(255, 255, 255, 0.06);
+  color: #a1a1aa;
+}
+
+[data-theme="dark"] .logout-button:hover {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+}
+
+[data-theme="dark"] .avatar {
+  background: rgba(244, 244, 245, 0.92);
+  color: #09090b;
+}
+
+[data-theme="dark"] .dashboard-theme-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #d4d4d8;
+}
+
+[data-theme="dark"] .dashboard-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* 3. Shared glass surfaces */
+
+[data-theme="dark"] .glass-panel,
+[data-theme="dark"] .glass-card {
+  background: var(--glass);
+  border-color: var(--glass-border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .glass-card::before,
+[data-theme="dark"] .glass-panel::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 40%);
+}
+
+[data-theme="dark"] .stat-card:hover,
+[data-theme="dark"] .widget-card:hover,
+[data-theme="dark"] .activity-card:hover,
+[data-theme="dark"] .privacy-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Every "subtle dark-ink tint" tile background (rgba(15,23,42,0.03-0.08))
+   used across activity lists, risk items, report tiles and history
+   cards becomes a light tint on dark instead. */
+[data-theme="dark"] .activity-item,
+[data-theme="dark"] .risk-item,
+[data-theme="dark"] .profile-view-item,
+[data-theme="dark"] .report-profile-item,
+[data-theme="dark"] .report-metric-tile,
+[data-theme="dark"] .report-wellness-item,
+[data-theme="dark"] .report-step-pill,
+[data-theme="dark"] .report-step-pill .report-step-index,
+[data-theme="dark"] .followup-question-card,
+[data-theme="dark"] .report-document-item,
+[data-theme="dark"] .report-qa-entry,
+[data-theme="dark"] .history-chart-card,
+[data-theme="dark"] .risk-item-icon,
+[data-theme="dark"] .stat-top > span,
+[data-theme="dark"] .risk-completeness {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .activity-item:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+[data-theme="dark"] .risk-item,
+[data-theme="dark"] .risk-disclaimer {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 4. Shared muted-text color group */
+
+[data-theme="dark"] .header-eyebrow,
+[data-theme="dark"] .profile-info span,
+[data-theme="dark"] .ai-tip p,
+[data-theme="dark"] .welcome-meta span,
+[data-theme="dark"] .stat-card > p,
+[data-theme="dark"] .stat-card small,
+[data-theme="dark"] .widget-title p,
+[data-theme="dark"] .widget-footer,
+[data-theme="dark"] .widget-footer button,
+[data-theme="dark"] .snapshot-list span,
+[data-theme="dark"] .section-heading p,
+[data-theme="dark"] .section-heading > svg,
+[data-theme="dark"] .privacy-card p,
+[data-theme="dark"] .privacy-card > span,
+[data-theme="dark"] .coming-soon-card p,
+[data-theme="dark"] .coming-soon-badge,
+[data-theme="dark"] .profile-loading,
+[data-theme="dark"] .profile-completion-top p,
+[data-theme="dark"] .profile-section-header p,
+[data-theme="dark"] .profile-field label,
+[data-theme="dark"] .profile-cancel-button,
+[data-theme="dark"] .profile-view-item span,
+[data-theme="dark"] .profile-setup-card p,
+[data-theme="dark"] .medication-title p,
+[data-theme="dark"] .medicine-time,
+[data-theme="dark"] .medication-empty,
+[data-theme="dark"] .risk-title p,
+[data-theme="dark"] .risk-item-content p,
+[data-theme="dark"] .risk-score span,
+[data-theme="dark"] .risk-disclaimer,
+[data-theme="dark"] .risk-unavailable,
+[data-theme="dark"] .risk-loading,
+[data-theme="dark"] .analysis-reminder-note,
+[data-theme="dark"] .analysis-photo-note,
+[data-theme="dark"] .analysis-feedback,
+[data-theme="dark"] .analysis-feedback-thanks,
+[data-theme="dark"] .analysis-disclaimer,
+[data-theme="dark"] .reminder-title p,
+[data-theme="dark"] .reminder-main span,
+[data-theme="dark"] .reminder-due,
+[data-theme="dark"] .reminder-empty,
+[data-theme="dark"] .report-empty-note,
+[data-theme="dark"] .report-header-meta,
+[data-theme="dark"] .report-metric-label,
+[data-theme="dark"] .report-metric-unit,
+[data-theme="dark"] .report-metric-range,
+[data-theme="dark"] .report-metric-count,
+[data-theme="dark"] .report-metric-empty,
+[data-theme="dark"] .report-profile-item span,
+[data-theme="dark"] .report-document-item-meta span,
+[data-theme="dark"] .report-content-section p,
+[data-theme="dark"] .report-content-section ul,
+[data-theme="dark"] .report-qa-answer,
+[data-theme="dark"] .report-print-analysis-item p,
+[data-theme="dark"] .latest-report-body span,
+[data-theme="dark"] .history-month-heading,
+[data-theme="dark"] .history-chart-header,
+[data-theme="dark"] .history-chart-empty,
+[data-theme="dark"] .settings-inline-action p,
+[data-theme="dark"] .history-search {
+  color: #a1a1aa;
+}
+
+/* 5. Shared primary-text color group */
+
+[data-theme="dark"] .risk-item-content strong,
+[data-theme="dark"] .risk-score strong,
+[data-theme="dark"] .risk-unavailable strong,
+[data-theme="dark"] .reminder-title-link,
+[data-theme="dark"] .medication-empty strong,
+[data-theme="dark"] .reminder-empty strong,
+[data-theme="dark"] .analysis-hospital-button,
+[data-theme="dark"] .analysis-photo-picker,
+[data-theme="dark"] .analysis-block p,
+[data-theme="dark"] .analysis-list li {
+  color: var(--text);
+}
+
+/* 6. Light-only inputs/buttons/surfaces that need a dark equivalent */
+
+[data-theme="dark"] .profile-field input,
+[data-theme="dark"] .profile-field select,
+[data-theme="dark"] .profile-field textarea,
+[data-theme="dark"] .followup-option-button,
+[data-theme="dark"] .analysis-hospital-button,
+[data-theme="dark"] .analysis-feedback-button,
+[data-theme="dark"] .analysis-photo-picker,
+[data-theme="dark"] .history-search,
+[data-theme="dark"] .report-qa-form input {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+}
+
+[data-theme="dark"] .profile-field input:focus,
+[data-theme="dark"] .profile-field select:focus,
+[data-theme="dark"] .profile-field textarea:focus,
+[data-theme="dark"] .report-qa-form input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(45, 212, 191, 0.55);
+}
+
+[data-theme="dark"] .analysis-hospital-button:hover,
+[data-theme="dark"] .analysis-feedback-button:hover:not(:disabled),
+[data-theme="dark"] .analysis-photo-picker:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .analysis-feedback-button.active {
+  background: rgba(45, 212, 191, 0.16);
+  color: #5eead4;
+}
+
+[data-theme="dark"] .add-medication-button,
+[data-theme="dark"] .add-reminder-button,
+[data-theme="dark"] .water-glasses button {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+}
+
+/* .medication-modal (add medicine / add reminder) is the one modal that
+   was styled light-only rather than intentionally-always-dark like
+   .vital-modal/.medical-modal/.document-modal, so it needs its own
+   dark surface here. */
+[data-theme="dark"] .medication-modal {
+  background: rgba(24, 25, 36, 0.96);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .modal-header {
+  background: rgba(24, 25, 36, 0.92);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .modal-header span {
+  color: #a1a1aa;
+}
+
+[data-theme="dark"] .modal-header h3 {
+  color: var(--text);
+}
+
+[data-theme="dark"] .modal-header > button {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #d4d4d8;
+}
+
+[data-theme="dark"] .medication-modal label > span {
+  color: #d4d4d8;
+}
+
+[data-theme="dark"] .medication-modal input {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+}
+
+[data-theme="dark"] .medication-modal input::placeholder {
+  color: #71717a;
+}
+
+[data-theme="dark"] .medication-modal input:focus {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 7. Per-widget touch-ups */
+
+[data-theme="dark"] .profile-view-item strong {
+  color: var(--text);
+}
+
+[data-theme="dark"] .quick-check-result {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .settings-danger-zone {
+  border-color: rgba(239, 68, 68, 0.35);
 }

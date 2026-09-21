@@ -12,6 +12,7 @@ import {
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import bgArtwork from "../assets/bg-artwork.png";
 import { useAuth } from "../context/AuthContext";
+import ThemeToggle from "../components/common/ThemeToggle";
 
 const PAGE_META: Record<string, { eyebrow: string; title: string }> = {
   "/dashboard": { eyebrow: "Health overview", title: "Personal dashboard" },
@@ -121,6 +122,8 @@ const DashboardLayout = () => {
           </div>
 
           <div className="profile-area">
+            <ThemeToggle className="dashboard-theme-toggle" />
+
             <div className="profile-info">
               <strong>{user?.name}</strong>
               <span>{user?.email}</span>
