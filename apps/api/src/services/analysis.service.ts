@@ -47,7 +47,7 @@ const sanitizeAIResult = (result: AIResult): AIResult => ({
 const truncate = (text: string, max: number) =>
   text.length > max ? `${text.slice(0, max)}…` : text;
 
-const buildProfileContext = (
+export const buildProfileContext = (
   profile: Awaited<ReturnType<typeof findProfileByUserId>>
 ) => {
   if (!profile) {

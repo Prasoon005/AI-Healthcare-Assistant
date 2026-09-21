@@ -29,6 +29,7 @@ import EmergencyCard from "./EmergencyCard";
 import MedicalVault from "./MedicalVault";
 import DailyPlanner from "./DailyPlanner";
 import FollowUpReminders from "./FollowUpReminders";
+import LatestReportCard from "./LatestReportCard";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -562,6 +563,9 @@ const Dashboard = () => {
             <ArrowRight size={15} />
           </Link>
         </div>
+
+        {/* Latest Health Report */}
+        <LatestReportCard />
       </section>
 
       {/* Medication Reminder Widget */}

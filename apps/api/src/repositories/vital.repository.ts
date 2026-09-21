@@ -36,6 +36,22 @@ export const getUserVitalLogs = async (
   });
 };
 
+export const getUserVitalLogsInRange = async (
+  userId: string,
+  start: Date | null,
+  end: Date
+) => {
+  return prisma.vitalLog.findMany({
+    where: {
+      userId,
+      recordedAt: start ? { gte: start, lte: end } : { lte: end },
+    },
+    orderBy: {
+      recordedAt: "desc",
+    },
+  });
+};
+
 export const deleteVitalLog = async (
   userId: string,
   vitalId: string

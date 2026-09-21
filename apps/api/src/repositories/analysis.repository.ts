@@ -54,6 +54,20 @@ export const findRecentAnalysesByUser = async (
   });
 };
 
+export const findAnalysesByUserInRange = async (
+  userId: string,
+  start: Date | null,
+  end: Date
+) => {
+  return prisma.healthAnalysis.findMany({
+    where: {
+      userId,
+      createdAt: start ? { gte: start, lte: end } : { lte: end },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
 export const updateAnalysisFeedback = async (
   id: string,
   userId: string,

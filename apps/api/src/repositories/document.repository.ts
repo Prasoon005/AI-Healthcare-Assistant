@@ -32,6 +32,23 @@ export const getUserDocuments = async (
   });
 };
 
+export const findDocumentsByIds = async (
+  userId: string,
+  ids: string[]
+) => {
+  if (ids.length === 0) return [];
+
+  return prisma.medicalDocument.findMany({
+    where: {
+      userId,
+      id: { in: ids },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
 export const findDocument = async (
   documentId: string,
   userId: string

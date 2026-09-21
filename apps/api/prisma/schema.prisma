@@ -33,6 +33,7 @@ model User {
   documents      MedicalDocument[]
   healthAnalyses HealthAnalysis[]
   reminders      Reminder[]
+  healthReports  HealthReport[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -166,6 +167,46 @@ model Reminder {
   createdAt DateTime @default(now())
 
   @@index([userId, dueDate])
+}
+
+model HealthReport {
+  id String @id @default(cuid())
+
+  rangeKey    String
+  periodStart DateTime?
+  periodEnd   DateTime
+
+  profileSnapshot    Json?
+  vitalsSummary      Json
+  wellnessSnapshot   Json
+  analysesSummary    Json
+  medicationsSummary Json
+  documentsSummary   Json
+  followUpAnswers    Json
+  reportContent      Json
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  questions ReportQuestion[]
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model ReportQuestion {
+  id String @id @default(cuid())
+
+  question String
+  answer   String
+
+  reportId String
+  report   HealthReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([reportId, createdAt])
 }
 
 model MedicalDocument {

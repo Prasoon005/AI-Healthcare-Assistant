@@ -7,6 +7,12 @@ import {
   type AIResult,
   type QuickCheckResult,
 } from "../validations/analysis.validation";
+import {
+  reportContentSchema,
+  reportQAResponseSchema,
+  type ReportContent,
+  type ReportQAResponse,
+} from "../validations/report.validation";
 
 export class AIUnavailableError extends Error {
   constructor(message = "AI service is temporarily unavailable") {
@@ -224,5 +230,93 @@ export const generateQuickCheck = async (
     buildPrompt(QUICK_CHECK_SYSTEM_INSTRUCTION, userPrompt),
     QUICK_CHECK_RESPONSE_SCHEMA,
     quickCheckResultSchema
+  );
+};
+
+const REPORT_RESPONSE_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    patientOverview: { type: "STRING" },
+    profileSummary: { type: "STRING" },
+    healthHistory: { type: "STRING" },
+    previousAnalyses: { type: "STRING" },
+    currentHealthStatus: { type: "STRING" },
+    vitalsSummary: { type: "STRING" },
+    medicationSummary: { type: "STRING" },
+    previousConcernsStatus: { type: "STRING" },
+    medicalDocumentsSummary: { type: "STRING" },
+    currentObservations: { type: "STRING" },
+    persistentConcerns: { type: "STRING" },
+    generalWellnessConsiderations: { type: "STRING" },
+    suggestedFollowUpTopics: { type: "ARRAY", items: { type: "STRING" } },
+    questionsForDoctor: { type: "ARRAY", items: { type: "STRING" } },
+    disclaimer: { type: "STRING" },
+  },
+  required: [
+    "patientOverview",
+    "profileSummary",
+    "healthHistory",
+    "previousAnalyses",
+    "currentHealthStatus",
+    "vitalsSummary",
+    "medicationSummary",
+    "previousConcernsStatus",
+    "medicalDocumentsSummary",
+    "currentObservations",
+    "persistentConcerns",
+    "generalWellnessConsiderations",
+    "suggestedFollowUpTopics",
+    "questionsForDoctor",
+    "disclaimer",
+  ],
+};
+
+const REPORT_SYSTEM_INSTRUCTION = `You are an educational health-report generator inside a consumer wellness app, HealthAI.
+
+Rules you must always follow:
+- You are NOT a doctor. Never diagnose, never state a condition as a certain fact.
+- Use ONLY the real information given below. If a section genuinely has no relevant underlying data, write exactly "Not available." for that section - never invent profile details, vitals, lab values, medications, or history to fill a gap.
+- Never invent lab/test result values, reference ranges, or diagnoses from documents. If extracted document text is unclear, incomplete, or missing, say so plainly rather than guessing values.
+- Never generate a numeric health score, risk percentage, or probability of any kind. A separate wellness indicator already exists in this app - do not create a new one, and do not restate its number as if you calculated it.
+- Never recommend starting, stopping, or changing a prescription medication. If the user reported stopping a medication early, note it neutrally as something to discuss with their prescriber, not as advice either way.
+- Never name a specific drug, brand name, or active ingredient anywhere in the report.
+- For "previousConcernsStatus", reflect the user's own follow-up answers about whether prior concerns are resolved/improved/still present/worse - do not contradict what the user reported, and do not claim a concern is resolved unless the user said so.
+- Keep tone clear, factual, and supportive. Each paragraph-style section should be 2-5 sentences. "suggestedFollowUpTopics" and "questionsForDoctor" are short bullet-style lists (each item one sentence).
+- Respond ONLY with JSON matching the required schema.`;
+
+const QA_RESPONSE_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    answer: { type: "STRING" },
+  },
+  required: ["answer"],
+};
+
+const QA_SYSTEM_INSTRUCTION = `You are HealthAI, answering a question about ONE specific, already-generated health report inside a consumer wellness app. This is not a general-purpose chatbot.
+
+Rules you must always follow:
+- Answer ONLY using the report content and context given below. Do not use outside medical knowledge to fill gaps, and do not answer questions unrelated to this report.
+- If the answer is not contained in the given report/context, respond with exactly: "I don't have enough information in this report to answer that."
+- You are NOT a doctor. Never diagnose, never state a probability/risk score, never recommend starting/stopping/changing a medication, never name a specific drug.
+- Keep the answer concise (a few sentences).
+- Respond ONLY with JSON matching the required schema.`;
+
+export const generateComprehensiveReport = async (
+  contextPrompt: string
+): Promise<ReportContent> => {
+  return callGemini(
+    buildPrompt(REPORT_SYSTEM_INSTRUCTION, contextPrompt),
+    REPORT_RESPONSE_SCHEMA,
+    reportContentSchema
+  );
+};
+
+export const answerReportQuestion = async (
+  contextPrompt: string
+): Promise<ReportQAResponse> => {
+  return callGemini(
+    buildPrompt(QA_SYSTEM_INSTRUCTION, contextPrompt),
+    QA_RESPONSE_SCHEMA,
+    reportQAResponseSchema
   );
 };

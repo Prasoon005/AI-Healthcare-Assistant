@@ -4503,3 +4503,519 @@
   text-decoration: underline;
   padding: 0;
 }
+
+/* =================================
+   HEALTH REPORTS
+================================= */
+
+.report-range-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.report-range-button {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(15, 23, 42, 0.03);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.report-range-button:hover {
+  background: rgba(15, 23, 42, 0.07);
+}
+
+.report-range-button.active {
+  background: rgba(79, 70, 229, 0.12);
+  border-color: rgba(79, 70, 229, 0.4);
+  color: #4f46e5;
+}
+
+.report-empty-note {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.report-back-link {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.report-back-link:hover {
+  text-decoration: underline;
+}
+
+.report-header-card {
+  padding: 24px 26px;
+}
+
+.report-header-card .profile-section-header {
+  margin-bottom: 0;
+}
+
+.report-header-meta {
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* Multi-step report generation wizard */
+
+.report-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.report-step-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.035);
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.report-step-pill .report-step-index {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.08);
+  font-size: 9px;
+}
+
+.report-step-pill.active {
+  background: rgba(79, 70, 229, 0.12);
+  color: #4f46e5;
+}
+
+.report-step-pill.active .report-step-index {
+  background: #4f46e5;
+  color: #ffffff;
+}
+
+.report-step-pill.done {
+  color: #0d9488;
+}
+
+.report-step-pill.done .report-step-index {
+  background: rgba(13, 148, 136, 0.16);
+  color: #0d9488;
+}
+
+.followup-question-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.035);
+  margin-bottom: 10px;
+}
+
+.followup-question-card strong {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.followup-question-tag {
+  display: inline-block;
+  width: fit-content;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.followup-question-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.followup-option-button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.followup-option-button.selected {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #ffffff;
+}
+
+.report-document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.report-document-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.035);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.report-document-item input {
+  flex-shrink: 0;
+}
+
+.report-document-item-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.report-document-item-meta strong {
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-document-item-meta span {
+  color: #64748b;
+  font-size: 9px;
+}
+
+.report-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px dashed rgba(15, 23, 42, 0.2);
+  background: transparent;
+  color: #4f46e5;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.report-wizard-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.report-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.report-profile-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.035);
+}
+
+.report-profile-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.report-profile-item span {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.report-profile-item strong {
+  font-size: 12px;
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.report-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.report-metric-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.035);
+}
+
+.report-metric-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.report-metric-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.report-metric-unit {
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  margin-left: 3px;
+}
+
+.report-metric-range {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.report-metric-count {
+  font-size: 9px;
+  color: #94a3b8;
+}
+
+.report-metric-empty {
+  font-size: 11px;
+  color: #94a3b8;
+  padding: 6px 0;
+}
+
+.report-wellness-score {
+  font-size: 13px;
+  color: var(--text);
+  margin: 12px 0;
+}
+
+.report-wellness-score strong {
+  font-size: 18px;
+  color: #4f46e5;
+}
+
+.report-wellness-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.report-wellness-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.035);
+  font-size: 12px;
+  color: var(--text);
+}
+
+.report-print-only {
+  display: none;
+}
+
+.report-print-analysis-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  font-size: 11px;
+}
+
+.report-print-analysis-item p {
+  margin: 2px 0 0;
+  color: #334155;
+}
+
+/* AI-generated report content (16 sections) */
+
+.report-content-section {
+  padding: 8px 0;
+}
+
+.report-content-section h4 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.report-content-section p {
+  margin: 0;
+  color: #334155;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.report-content-section ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #334155;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* Ask HealthAI about this report */
+
+.report-qa-log {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.report-qa-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.035);
+}
+
+.report-qa-question {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.report-qa-answer {
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.report-qa-form {
+  display: flex;
+  gap: 8px;
+}
+
+.report-qa-form input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  color: var(--text);
+}
+
+.report-qa-form input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+/* Dashboard "latest report" widget */
+
+.latest-report-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 0 14px;
+}
+
+.latest-report-body strong {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.latest-report-body span {
+  font-size: 11px;
+  color: #64748b;
+}
+
+@media print {
+  .dashboard-sidebar,
+  .dashboard-header,
+  .ambient,
+  .cursor-glow,
+  .no-print {
+    display: none !important;
+  }
+
+  .dashboard-main {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .dashboard-shell,
+  .dashboard-shell::before,
+  .dashboard-shell::after {
+    background: #ffffff !important;
+    color: #09090b !important;
+  }
+
+  /*
+   * backdrop-filter/box-shadow on .glass-card interact badly with Chrome's
+   * print/PDF renderer and can make card content render blank - must be
+   * fully disabled for print, not just re-colored.
+   */
+  .glass-card,
+  .profile-section {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+    break-inside: avoid;
+  }
+
+  .glass-card::before,
+  .glass-panel::before {
+    display: none !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .activity-list {
+    display: none !important;
+  }
+
+  .report-print-only {
+    display: block !important;
+  }
+}
