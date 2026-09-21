@@ -1,10 +1,22 @@
-import { HeartPulse, Search } from "lucide-react";
+import { ChevronDown, HeartPulse, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import bgArtwork from "../assets/bg-artwork.png";
 import LanguageSelector from "../components/landing/LanguageSelector";
 import ThemeToggle from "../components/common/ThemeToggle";
 import HealthShowcase from "../components/landing/HealthShowcase";
+import HowItWorks from "../components/landing/HowItWorks";
+import FeatureShowcase from "../components/landing/FeatureShowcase";
+import OneHealthStory from "../components/landing/OneHealthStory";
+import FinalCta from "../components/landing/FinalCta";
+import LandingFooter from "../components/landing/LandingFooter";
 import "./Home.css";
+
+const TRUST_ITEMS = [
+  "Private workspace",
+  "AI-assisted insights",
+  "Organized history",
+  "Secure by design",
+];
 
 const Home = () => {
   return (
@@ -67,7 +79,32 @@ const Home = () => {
         </div>
 
         <HealthShowcase />
+
+        <a href="#landing-trust" className="landing-scroll-cue">
+          Explore HealthAI
+          <ChevronDown size={14} />
+        </a>
       </main>
+
+      <div id="landing-trust" className="landing-trust-line">
+        <span className="landing-trust-dot" />
+        {TRUST_ITEMS.map((item, index) => (
+          <span key={item} className="landing-trust-line-item">
+            {item}
+            {index < TRUST_ITEMS.length - 1 && (
+              <span className="landing-trust-sep" aria-hidden="true">
+                ·
+              </span>
+            )}
+          </span>
+        ))}
+      </div>
+
+      <HowItWorks />
+      <FeatureShowcase />
+      <OneHealthStory />
+      <FinalCta />
+      <LandingFooter />
     </div>
   );
 };
