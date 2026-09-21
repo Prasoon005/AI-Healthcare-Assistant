@@ -1,11 +1,12 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useEffect, useState } from "react";
-import { Activity, AlertTriangle, ArrowRight, CalendarDays, ClipboardCheck, Info, ShieldCheck, Sparkles, UserRound, Search, Droplets, } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Activity, AlertTriangle, ArrowRight, CalendarDays, ClipboardCheck, FileText, HeartPulse, Info, Pill, RefreshCw, ShieldCheck, Sparkles, UserRound, Search, Droplets, } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getHealthProfile } from "../../api/profile";
 import { getRiskMatrix } from "../../api/risk";
 import { getAnalysisHistory, runQuickSymptomCheck, } from "../../api/analysis";
+import { getRecentActivity, } from "../../api/history";
 import MedicationReminder from "./MedicationReminder";
 import VitalsCard from "./VitalsCard";
 import RiskMatrix from "./RiskMatrix";
@@ -14,8 +15,18 @@ import MedicalVault from "./MedicalVault";
 import DailyPlanner from "./DailyPlanner";
 import FollowUpReminders from "./FollowUpReminders";
 import LatestReportCard from "./LatestReportCard";
+const RECENT_ACTIVITY_ICON = {
+    profile: UserRound,
+    analysis: ClipboardCheck,
+    report: FileText,
+    vital: HeartPulse,
+    medication: Pill,
+    document: FileText,
+    followup: RefreshCw,
+};
 const Dashboard = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const firstName = user?.name?.split(" ")[0] || "there";
     const [water, setWater] = useState(0);
     const [symptom, setSymptom] = useState("");
@@ -25,6 +36,8 @@ const Dashboard = () => {
     const latestAnalysis = analysisHistory[0] ?? null;
     const [wellnessScore, setWellnessScore] = useState(null);
     const [wellnessLoading, setWellnessLoading] = useState(true);
+    const [recentActivity, setRecentActivity] = useState([]);
+    const [recentActivityLoading, setRecentActivityLoading] = useState(true);
     const [quickCheckStatus, setQuickCheckStatus] = useState("idle");
     const [quickCheckResult, setQuickCheckResult] = useState(null);
     useEffect(() => {
@@ -61,10 +74,36 @@ const Dashboard = () => {
                 setWellnessLoading(false);
             }
         };
+        const loadRecentActivity = async () => {
+            try {
+                const result = await getRecentActivity(5);
+                setRecentActivity(result);
+            }
+            catch (error) {
+                console.error("Failed to load recent activity:", error);
+            }
+            finally {
+                setRecentActivityLoading(false);
+            }
+        };
         loadProfileCompletion();
         loadAnalysisHistory();
         loadWellnessScore();
+        loadRecentActivity();
     }, []);
+    const handleRecentActivityClick = (event) => {
+        if (!event.link)
+            return;
+        if (event.link.type === "analysis") {
+            navigate(`/analysis?id=${event.link.id}`);
+        }
+        else if (event.link.type === "report") {
+            navigate(`/reports?id=${event.link.id}`);
+        }
+        else if (event.link.type === "document") {
+            navigate("/history");
+        }
+    };
     const formatRelativeDate = (isoDate) => {
         const date = new Date(isoDate);
         const days = Math.floor((Date.now() - date.getTime()) / 86400000);
@@ -182,12 +221,13 @@ const Dashboard = () => {
                                                     ? "Loading..."
                                                     : latestAnalysis
                                                         ? formatRelativeDate(latestAnalysis.createdAt)
-                                                        : "No data" })] })] }), _jsxs(Link, { to: latestAnalysis ? `/analysis?id=${latestAnalysis.id}` : "/profile", className: "secondary-action", children: [latestAnalysis ? "View last analysis" : "Complete profile", _jsx(ArrowRight, { size: 15 })] })] }), _jsx(LatestReportCard, {})] }), _jsx(MedicationReminder, {}), _jsx(FollowUpReminders, {}), _jsx(VitalsCard, {}), _jsx(RiskMatrix, {}), _jsx(EmergencyCard, {}), _jsx(MedicalVault, {}), _jsx(DailyPlanner, {}), _jsxs("section", { className: "bottom-grid", children: [_jsxs("div", { className: "activity-card glass-card", children: [_jsxs("div", { className: "section-heading", children: [_jsxs("div", { children: [_jsx("h3", { children: "Recent activity" }), _jsx("p", { children: "Your latest HealthAI activity" })] }), _jsx(Activity, { size: 18 })] }), analysisLoading ? (_jsx("div", { className: "empty-state", children: _jsx("p", { children: "Loading your recent activity..." }) })) : analysisHistory.length > 0 ? (_jsxs(_Fragment, { children: [_jsx("div", { className: "activity-list", children: analysisHistory.slice(0, 5).map((entry) => (_jsxs(Link, { to: `/analysis?id=${entry.id}`, className: "activity-item", children: [_jsx("div", { className: "activity-item-icon", children: _jsx(ClipboardCheck, { size: 17 }) }), _jsxs("div", { className: "activity-item-content", children: [_jsx("strong", { children: entry.concern.length > 70
-                                                                ? `${entry.concern.slice(0, 70)}…`
-                                                                : entry.concern }), _jsxs("span", { children: ["Health analysis \u00B7", " ", formatRelativeDate(entry.createdAt)] })] }), _jsx("span", { className: `risk-badge ${entry.urgencyLevel === "routine"
-                                                        ? "low"
-                                                        : entry.urgencyLevel === "soon"
-                                                            ? "moderate"
-                                                            : "high"}`, children: URGENCY_STATUS_LABEL[entry.urgencyLevel] })] }, entry.id))) }), analysisHistory.length > 5 && (_jsxs(Link, { to: "/analysis", className: "secondary-action", children: ["View all analyses", _jsx(ArrowRight, { size: 15 })] }))] })) : (_jsxs("div", { className: "empty-state", children: [_jsx("div", { children: _jsx(Activity, { size: 21 }) }), _jsx("strong", { children: "No activity yet" }), _jsx("p", { children: "Complete an analysis to start building your health history." })] }))] }), _jsxs("div", { className: "privacy-card glass-card", children: [_jsx("div", { className: "privacy-icon", children: _jsx(ShieldCheck, { size: 21 }) }), _jsx("h3", { children: "Your health, your control." }), _jsx("p", { children: "HealthAI keeps your health experience private and personalized." }), _jsxs("span", { children: ["Secure health workspace", _jsx("span", { className: "status-dot" })] })] })] })] }));
+                                                        : "No data" })] })] }), _jsxs(Link, { to: latestAnalysis ? `/analysis?id=${latestAnalysis.id}` : "/profile", className: "secondary-action", children: [latestAnalysis ? "View last analysis" : "Complete profile", _jsx(ArrowRight, { size: 15 })] })] }), _jsx(LatestReportCard, {})] }), _jsx(MedicationReminder, {}), _jsx(FollowUpReminders, {}), _jsx(VitalsCard, {}), _jsx(RiskMatrix, {}), _jsx(EmergencyCard, {}), _jsx(MedicalVault, {}), _jsx(DailyPlanner, {}), _jsxs("section", { className: "bottom-grid", children: [_jsxs("div", { className: "activity-card glass-card", children: [_jsxs("div", { className: "section-heading", children: [_jsxs("div", { children: [_jsx("h3", { children: "Recent activity" }), _jsx("p", { children: "Your latest HealthAI activity" })] }), _jsx(Activity, { size: 18 })] }), recentActivityLoading ? (_jsx("div", { className: "empty-state", children: _jsx("p", { children: "Loading your recent activity..." }) })) : recentActivity.length > 0 ? (_jsxs(_Fragment, { children: [_jsx("div", { className: "activity-list", children: recentActivity.map((event) => {
+                                            const Icon = RECENT_ACTIVITY_ICON[event.type];
+                                            return (_jsxs("div", { className: `activity-item ${event.link ? "dashboard-activity-clickable" : ""}`, onClick: event.link
+                                                    ? () => handleRecentActivityClick(event)
+                                                    : undefined, children: [_jsx("div", { className: "activity-item-icon", children: _jsx(Icon, { size: 17 }) }), _jsxs("div", { className: "activity-item-content", children: [_jsx("strong", { children: event.title.length > 70
+                                                                    ? `${event.title.slice(0, 70)}…`
+                                                                    : event.title }), _jsx("span", { children: formatRelativeDate(event.occurredAt) })] })] }, event.id));
+                                        }) }), _jsxs(Link, { to: "/history", className: "secondary-action", children: ["View full history", _jsx(ArrowRight, { size: 15 })] })] })) : (_jsxs("div", { className: "empty-state", children: [_jsx("div", { children: _jsx(Activity, { size: 21 }) }), _jsx("strong", { children: "No activity yet" }), _jsx("p", { children: "Complete an analysis to start building your health history." })] }))] }), _jsxs("div", { className: "privacy-card glass-card", children: [_jsx("div", { className: "privacy-icon", children: _jsx(ShieldCheck, { size: 21 }) }), _jsx("h3", { children: "Your health, your control." }), _jsx("p", { children: "HealthAI keeps your health experience private and personalized." }), _jsxs("span", { children: ["Secure health workspace", _jsx("span", { className: "status-dot" })] })] })] })] }));
 };
 export default Dashboard;

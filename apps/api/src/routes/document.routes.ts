@@ -8,6 +8,7 @@ import fs from "fs";
 
 import {
   deleteDocumentController,
+  getDocumentController,
   getDocumentsController,
   uploadDocumentController,
 } from "../controllers/document.controller";
@@ -115,6 +116,11 @@ router.post(
   "/upload",
   upload.single("document"),
   uploadDocumentController
+);
+
+router.get(
+  "/:documentId",
+  getDocumentController
 );
 
 router.delete(

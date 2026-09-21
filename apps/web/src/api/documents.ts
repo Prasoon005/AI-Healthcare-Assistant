@@ -25,6 +25,19 @@ export const getDocuments =
     return response.data.data;
   };
 
+export const getDocument =
+  async (
+    documentId: string
+  ): Promise<MedicalDocument> => {
+    const response =
+      await api.get<{
+        success: boolean;
+        data: MedicalDocument;
+      }>(`/documents/${documentId}`);
+
+    return response.data.data;
+  };
+
 export const uploadDocument =
   async (
     file: File

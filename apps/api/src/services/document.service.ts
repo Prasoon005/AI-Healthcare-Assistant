@@ -65,6 +65,19 @@ export const getDocuments = async (
   return getUserDocuments(userId);
 };
 
+export const getDocumentById = async (
+  userId: string,
+  documentId: string
+) => {
+  const document = await findDocument(documentId, userId);
+
+  if (!document) {
+    throw new Error("Document not found");
+  }
+
+  return document;
+};
+
 export const removeDocument = async (
   userId: string,
   documentId: string

@@ -39,7 +39,8 @@ export const getUserVitalLogs = async (
 export const getUserVitalLogsInRange = async (
   userId: string,
   start: Date | null,
-  end: Date
+  end: Date,
+  take?: number
 ) => {
   return prisma.vitalLog.findMany({
     where: {
@@ -49,6 +50,7 @@ export const getUserVitalLogsInRange = async (
     orderBy: {
       recordedAt: "desc",
     },
+    ...(take ? { take } : {}),
   });
 };
 

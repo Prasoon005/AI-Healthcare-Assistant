@@ -51,6 +51,32 @@ export const findLatestReportSummaryByUser = async (userId: string) => {
   });
 };
 
+const HISTORY_SELECT = {
+  id: true,
+  rangeKey: true,
+  periodStart: true,
+  periodEnd: true,
+  followUpAnswers: true,
+  createdAt: true,
+} as const;
+
+export const findReportsForHistory = async (
+  userId: string,
+  start: Date | null,
+  end: Date,
+  take?: number
+) => {
+  return prisma.healthReport.findMany({
+    where: {
+      userId,
+      createdAt: start ? { gte: start, lte: end } : { lte: end },
+    },
+    orderBy: { createdAt: "desc" },
+    select: HISTORY_SELECT,
+    ...(take ? { take } : {}),
+  });
+};
+
 export const findLatestReportByUser = async (userId: string) => {
   return prisma.healthReport.findFirst({
     where: { userId },

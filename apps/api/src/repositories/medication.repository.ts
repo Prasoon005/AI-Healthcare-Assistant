@@ -35,6 +35,26 @@ export const createMedication = (
   });
 };
 
+export const findAllMedicationsByUser = (userId: string) => {
+  return prisma.medication.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
+export const findMedicationLogsByUserInRange = (
+  userId: string,
+  start: Date | null,
+  end: Date
+) => {
+  return prisma.medicationLog.findMany({
+    where: {
+      medication: { userId },
+      scheduledDate: start ? { gte: start, lte: end } : { lte: end },
+    },
+  });
+};
+
 export const findMedication = (
   medicationId: string,
   userId: string

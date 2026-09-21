@@ -27,7 +27,7 @@ const PROFILE_FIELDS = [
   "emergencyPhone",
 ] as const;
 
-const calculateCompletion = (
+export const calculateCompletion = (
   profile: Record<string, unknown> | null
 ) => {
   if (!profile) return 0;

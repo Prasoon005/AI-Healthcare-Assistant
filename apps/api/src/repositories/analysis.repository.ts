@@ -57,7 +57,8 @@ export const findRecentAnalysesByUser = async (
 export const findAnalysesByUserInRange = async (
   userId: string,
   start: Date | null,
-  end: Date
+  end: Date,
+  take?: number
 ) => {
   return prisma.healthAnalysis.findMany({
     where: {
@@ -65,6 +66,7 @@ export const findAnalysesByUserInRange = async (
       createdAt: start ? { gte: start, lte: end } : { lte: end },
     },
     orderBy: { createdAt: "desc" },
+    ...(take ? { take } : {}),
   });
 };
 

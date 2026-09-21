@@ -7,6 +7,7 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import HealthProfile from "../pages/profile/HealthProfile";
 import HealthAnalysis from "../pages/analysis/HealthAnalysis";
 import Reports from "../pages/reports/Reports";
+import History from "../pages/history/History";
 import Settings from "../pages/settings/Settings";
 import NotFound from "../pages/NotFound";
 import ProtectedRoute from "./ProtectedRoute";
@@ -28,6 +29,7 @@ const AppRoutes = () => {
             <Route path="/profile" element={<HealthProfile />} />
             <Route path="/analysis" element={<HealthAnalysis />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/history" element={<History />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Route>

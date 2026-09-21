@@ -32,6 +32,22 @@ export const getUserDocuments = async (
   });
 };
 
+export const findDocumentsByUserInRange = async (
+  userId: string,
+  start: Date | null,
+  end: Date,
+  take?: number
+) => {
+  return prisma.medicalDocument.findMany({
+    where: {
+      userId,
+      createdAt: start ? { gte: start, lte: end } : { lte: end },
+    },
+    orderBy: { createdAt: "desc" },
+    ...(take ? { take } : {}),
+  });
+};
+
 export const findDocumentsByIds = async (
   userId: string,
   ids: string[]

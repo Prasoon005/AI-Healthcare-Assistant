@@ -11,6 +11,7 @@ import profileRoutes from "./profile.routes";
 import analysisRoutes from "./analysis.routes";
 import reminderRoutes from "./reminder.routes";
 import reportRoutes from "./report.routes";
+import historyRoutes from "./history.routes";
 const router = Router();
 
 router.use("/auth", authRoutes);
@@ -27,4 +28,5 @@ router.use("/profile", profileRoutes);
 router.use("/analysis", analysisRoutes);
 router.use("/reminders", reminderRoutes);
 router.use("/reports", reportRoutes);
+router.use("/history", historyRoutes);
 export default router;

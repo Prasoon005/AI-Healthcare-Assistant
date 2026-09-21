@@ -5019,3 +5019,152 @@
     display: block !important;
   }
 }
+
+/* =================================
+   HEALTH HISTORY
+================================= */
+
+.history-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin: 14px 0;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.5);
+  color: #64748b;
+}
+
+.history-search input {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.history-search-clear {
+  border: none;
+  background: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+}
+
+.history-type-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.history-group {
+  margin-bottom: 18px;
+}
+
+.history-group:last-child {
+  margin-bottom: 0;
+}
+
+.history-month-heading {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+}
+
+.history-event-item.clickable {
+  cursor: pointer;
+}
+
+.dashboard-activity-clickable {
+  cursor: pointer;
+}
+
+.history-subheading {
+  margin: 18px 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.history-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.history-chart-card {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.history-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.history-chart-header strong {
+  font-size: 13px;
+}
+
+.history-chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.history-progress-card {
+  margin: 6px 0 4px;
+}
+
+.history-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.history-progress-header strong {
+  font-size: 14px;
+  color: #0d9488;
+}
+
+.history-ai-insight {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(79, 70, 229, 0.07);
+  color: #4338ca;
+}
+
+.history-ai-insight p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+@media (max-width: 640px) {
+  .history-chart-grid {
+    grid-template-columns: 1fr;
+  }
+}

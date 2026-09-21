@@ -5,14 +5,18 @@ import {
   ArrowRight,
   CalendarDays,
   ClipboardCheck,
+  FileText,
+  HeartPulse,
   Info,
+  Pill,
+  RefreshCw,
   ShieldCheck,
   Sparkles,
   UserRound,
   Search,
   Droplets,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getHealthProfile } from "../../api/profile";
 import { getRiskMatrix } from "../../api/risk";
@@ -22,6 +26,11 @@ import {
   type HealthAnalysis,
   type QuickCheckResult,
 } from "../../api/analysis";
+import {
+  getRecentActivity,
+  type HistoryEvent,
+  type HistoryEventType,
+} from "../../api/history";
 import MedicationReminder from "./MedicationReminder";
 import VitalsCard from "./VitalsCard";
 import RiskMatrix from "./RiskMatrix";
@@ -31,8 +40,19 @@ import DailyPlanner from "./DailyPlanner";
 import FollowUpReminders from "./FollowUpReminders";
 import LatestReportCard from "./LatestReportCard";
 
+const RECENT_ACTIVITY_ICON: Record<Exclude<HistoryEventType, "all">, typeof FileText> = {
+  profile: UserRound,
+  analysis: ClipboardCheck,
+  report: FileText,
+  vital: HeartPulse,
+  medication: Pill,
+  document: FileText,
+  followup: RefreshCw,
+};
+
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const firstName = user?.name?.split(" ")[0] || "there";
 
   const [water, setWater] = useState(0);
@@ -48,6 +68,9 @@ const Dashboard = () => {
 
   const [wellnessScore, setWellnessScore] = useState<number | null>(null);
   const [wellnessLoading, setWellnessLoading] = useState(true);
+
+  const [recentActivity, setRecentActivity] = useState<HistoryEvent[]>([]);
+  const [recentActivityLoading, setRecentActivityLoading] = useState(true);
 
   const [quickCheckStatus, setQuickCheckStatus] = useState<
     "idle" | "checking" | "result" | "needs-more" | "error"
@@ -93,10 +116,34 @@ const Dashboard = () => {
       }
     };
 
+    const loadRecentActivity = async () => {
+      try {
+        const result = await getRecentActivity(5);
+        setRecentActivity(result);
+      } catch (error) {
+        console.error("Failed to load recent activity:", error);
+      } finally {
+        setRecentActivityLoading(false);
+      }
+    };
+
     loadProfileCompletion();
     loadAnalysisHistory();
     loadWellnessScore();
+    loadRecentActivity();
   }, []);
+
+  const handleRecentActivityClick = (event: HistoryEvent) => {
+    if (!event.link) return;
+
+    if (event.link.type === "analysis") {
+      navigate(`/analysis?id=${event.link.id}`);
+    } else if (event.link.type === "report") {
+      navigate(`/reports?id=${event.link.id}`);
+    } else if (event.link.type === "document") {
+      navigate("/history");
+    }
+  };
 
   const formatRelativeDate = (isoDate: string) => {
     const date = new Date(isoDate);
@@ -595,56 +642,49 @@ const Dashboard = () => {
             <Activity size={18} />
           </div>
 
-          {analysisLoading ? (
+          {recentActivityLoading ? (
             <div className="empty-state">
               <p>Loading your recent activity...</p>
             </div>
-          ) : analysisHistory.length > 0 ? (
+          ) : recentActivity.length > 0 ? (
             <>
               <div className="activity-list">
-                {analysisHistory.slice(0, 5).map((entry) => (
-                  <Link
-                    key={entry.id}
-                    to={`/analysis?id=${entry.id}`}
-                    className="activity-item"
-                  >
-                    <div className="activity-item-icon">
-                      <ClipboardCheck size={17} />
-                    </div>
+                {recentActivity.map((event) => {
+                  const Icon = RECENT_ACTIVITY_ICON[event.type];
 
-                    <div className="activity-item-content">
-                      <strong>
-                        {entry.concern.length > 70
-                          ? `${entry.concern.slice(0, 70)}…`
-                          : entry.concern}
-                      </strong>
-                      <span>
-                        Health analysis ·{" "}
-                        {formatRelativeDate(entry.createdAt)}
-                      </span>
-                    </div>
-
-                    <span
-                      className={`risk-badge ${
-                        entry.urgencyLevel === "routine"
-                          ? "low"
-                          : entry.urgencyLevel === "soon"
-                          ? "moderate"
-                          : "high"
+                  return (
+                    <div
+                      key={event.id}
+                      className={`activity-item ${
+                        event.link ? "dashboard-activity-clickable" : ""
                       }`}
+                      onClick={
+                        event.link
+                          ? () => handleRecentActivityClick(event)
+                          : undefined
+                      }
                     >
-                      {URGENCY_STATUS_LABEL[entry.urgencyLevel]}
-                    </span>
-                  </Link>
-                ))}
+                      <div className="activity-item-icon">
+                        <Icon size={17} />
+                      </div>
+
+                      <div className="activity-item-content">
+                        <strong>
+                          {event.title.length > 70
+                            ? `${event.title.slice(0, 70)}…`
+                            : event.title}
+                        </strong>
+                        <span>{formatRelativeDate(event.occurredAt)}</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
-              {analysisHistory.length > 5 && (
-                <Link to="/analysis" className="secondary-action">
-                  View all analyses
-                  <ArrowRight size={15} />
-                </Link>
-              )}
+              <Link to="/history" className="secondary-action">
+                View full history
+                <ArrowRight size={15} />
+              </Link>
             </>
           ) : (
             <div className="empty-state">

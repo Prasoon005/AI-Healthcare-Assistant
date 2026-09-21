@@ -3,6 +3,10 @@ export const getDocuments = async () => {
     const response = await api.get("/documents");
     return response.data.data;
 };
+export const getDocument = async (documentId) => {
+    const response = await api.get(`/documents/${documentId}`);
+    return response.data.data;
+};
 export const uploadDocument = async (file) => {
     const formData = new FormData();
     formData.append("document", file);

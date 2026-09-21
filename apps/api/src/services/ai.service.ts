@@ -13,6 +13,10 @@ import {
   type ReportContent,
   type ReportQAResponse,
 } from "../validations/report.validation";
+import {
+  historyInsightSchema,
+  type HistoryInsight,
+} from "../validations/history.validation";
 
 export class AIUnavailableError extends Error {
   constructor(message = "AI service is temporarily unavailable") {
@@ -318,5 +322,32 @@ export const answerReportQuestion = async (
     buildPrompt(QA_SYSTEM_INSTRUCTION, contextPrompt),
     QA_RESPONSE_SCHEMA,
     reportQAResponseSchema
+  );
+};
+
+const HISTORY_INSIGHT_RESPONSE_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    insight: { type: "STRING" },
+  },
+  required: ["insight"],
+};
+
+const HISTORY_INSIGHT_SYSTEM_INSTRUCTION = `You write a single short, educational summary describing a user's recorded health activity over a period inside a consumer wellness app, HealthAI.
+
+Rules you must always follow:
+- Use ONLY the real counts/values given below. Do not invent numbers, trends, or events not present in the data.
+- Purely DESCRIBE what was recorded (e.g. "Three health analyses were recorded, and two follow-up updates were made"). Never diagnose, never infer a disease or condition from a trend, never generate a probability or risk percentage, never recommend starting/stopping/changing a medication, never name a specific drug.
+- Do not draw a medical conclusion from adherence or activity volume (e.g. never say activity level caused a health outcome).
+- Keep it to 2-4 sentences, plain language.
+- Respond ONLY with JSON matching the required schema.`;
+
+export const generateHistoryInsight = async (
+  contextPrompt: string
+): Promise<HistoryInsight> => {
+  return callGemini(
+    buildPrompt(HISTORY_INSIGHT_SYSTEM_INSTRUCTION, contextPrompt),
+    HISTORY_INSIGHT_RESPONSE_SCHEMA,
+    historyInsightSchema
   );
 };

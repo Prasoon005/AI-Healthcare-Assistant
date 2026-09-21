@@ -4,6 +4,7 @@ import {
   ClipboardCheck,
   FileText,
   HeartPulse,
+  History,
   LogOut,
   Settings,
   UserRound,
@@ -17,6 +18,7 @@ const PAGE_META: Record<string, { eyebrow: string; title: string }> = {
   "/profile": { eyebrow: "Personalization", title: "Health profile" },
   "/analysis": { eyebrow: "Assessment", title: "Health analysis" },
   "/reports": { eyebrow: "Insights", title: "Health reports" },
+  "/history": { eyebrow: "Timeline", title: "Health history" },
   "/settings": { eyebrow: "Account", title: "Settings" },
 };
 
@@ -91,6 +93,11 @@ const DashboardLayout = () => {
           <NavLink to="/reports" className={navLinkClass}>
             <FileText size={18} />
             <span>Reports</span>
+          </NavLink>
+
+          <NavLink to="/history" className={navLinkClass}>
+            <History size={18} />
+            <span>History</span>
           </NavLink>
 
           <NavLink to="/settings" className={navLinkClass}>

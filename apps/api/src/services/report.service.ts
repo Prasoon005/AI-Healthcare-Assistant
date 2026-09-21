@@ -280,7 +280,12 @@ export interface FollowUpQuestion {
   options: FollowUpQuestionOption[];
 }
 
-type StoredFollowUpAnswer = FollowUpAnswerInput & { answeredAt: string };
+export type StoredFollowUpAnswer = FollowUpAnswerInput & {
+  answeredAt: string;
+  // Embedded so History (Phase 12) can still label this event correctly
+  // even if the underlying medication/analysis is later deleted.
+  refLabel: string;
+};
 
 const MEDICATION_OPTIONS: FollowUpQuestionOption[] = [
   { value: "completed", label: "Completed" },
@@ -491,6 +496,15 @@ export const generateReport = async (
   const storedFollowUpAnswers: StoredFollowUpAnswer[] = input.followUpAnswers.map(
     (answer) => ({
       ...answer,
+      refLabel:
+        answer.type === "medication"
+          ? medications.find((med) => med.id === answer.refId)?.name ??
+            "Medication"
+          : truncate(
+              recentAnalyses.find((item) => item.id === answer.refId)
+                ?.concern ?? "Previous concern",
+              100
+            ),
       answeredAt: new Date().toISOString(),
     })
   );

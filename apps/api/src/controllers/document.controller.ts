@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import {
+  getDocumentById,
   getDocuments,
   removeDocument,
   uploadMedicalDocument,
@@ -83,6 +84,27 @@ export const getDocumentsController =
       );
     }
   };
+
+export const getDocumentController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const document = await getDocumentById(
+      req.user!.id,
+      req.params.documentId as string
+    );
+
+    return successResponse(
+      res,
+      200,
+      "Medical document fetched successfully",
+      document
+    );
+  } catch (error) {
+    return errorResponse(res, 404, "Document not found");
+  }
+};
 
 export const deleteDocumentController =
   async (
